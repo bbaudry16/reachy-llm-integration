@@ -1,0 +1,3 @@
+[submodule "libs/reachyController"]
+	path = libs/reachyController
+	url = https://github.com/bbaudry16/reachyController
