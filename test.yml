@@ -1,0 +1,120 @@
+format : reachy_instruction
+version : 1.0
+extension : .ryi
+
+reachy:
+
+- disable_table_collision:
+    arm : left
+
+
+- disable_table_collision:
+    arm : right
+
+- reachy_on
+
+- do:
+    times: 1
+    actions :
+        - look_at: 
+            target : [1, 0, 0]
+        
+        - close_hand :
+            arm : left
+
+        - place_hand_on_table : 
+            arm : right
+            duration : 2
+
+        - parallel:
+            - capture:
+                as : record
+                action :
+                    record_all:
+                        duration: 5
+                        fps: 30
+
+            - move_hand:
+                arm : right
+                position: [0.5, 0.5, 0.5]
+                orientation: [0, 90, 0]
+                duration: 5
+
+            - look_at: 
+                target : [0.5, 0.5, 0.3]
+            
+            - open_hand :
+                arm : left
+                duration : 5
+        - capture :
+            as : print
+            action :
+                get_joint_positions :
+                    arm : right
+
+        - print :
+            message : 
+                add:
+                    - "joint position : "
+                    - $print
+            type : debug
+        - save_record_as_CSV:
+            file_name : test_yml.csv
+            record: $record
+        
+        - capture:
+            as : a
+            action :
+                load_record_from_CSV:
+                    file_name : test_yml.csv
+        
+        - play_record_all :
+            record : $a
+            start_duration : 3
+
+- move_joints:
+            arm : right
+            joints: [-132.55, 9.87, 31.95, -1.16, 39.14, -0.2, 7.63]
+            duration : 3
+            collision_check_number : 3
+            interpolation : linear
+
+- capture :
+    as : print
+    action :
+        get_joint_positions :
+            arm : right
+
+- print :
+    message : 
+        add:
+            - "joint position : "
+            - $print
+    type : debug
+
+- capture :
+    as : head_pos
+    action:
+        get_look_position
+    
+- capture :
+    as : hand_pos
+    action:
+        get_hand_position :
+            arm : right
+        
+- print :
+    message :
+        add:
+            - "head position : "
+            - $head_pos
+
+- print :
+    message :
+        add:
+            - "arm position : "
+            - $hand_pos
+- close_hand:
+    arm : right
+
+- reachy_off
