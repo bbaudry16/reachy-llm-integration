@@ -1,0 +1,10 @@
+faster_whisper==1.2.1
+matplotlib==3.5.1
+numpy==1.21.0
+pandas==1.4.1
+piper==0.15.1
+PyYAML==6.0.3
+reachy_sdk==0.5.4
+Requests==2.34.2
+scipy==1.7.3
+sounddevice==0.5.5

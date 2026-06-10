@@ -7,24 +7,24 @@ class SpeechToText:
 
     def __init__(self, model: str = "small", language: str = "en", sample_rate: int = 16000, device: str = "cpu", compute_type: str = "int8"):
 
-        self.language    = language
+        self.language = language
         self.sample_rate = sample_rate
 
-        print(f"Chargement du modèle Whisper '{model}'...")
+        print(f"Loding Whisper '{model}'...")
         self._model = WhisperModel(model, device=device, compute_type=compute_type)
-        print("Modèle chargé.\n")
+        print("Model loaded\n")
 
     def _record(self, silence_threshold: float = 0.07, silence_duration: float = 3.0, max_duration: float = 30.0) -> np.ndarray:
         
-        chunk_size    = int(self.sample_rate * 0.1)
-        max_chunks    = int(max_duration / 0.1)
+        chunk_size = int(self.sample_rate * 0.1)
+        max_chunks = int(max_duration / 0.1)
         silent_chunks = int(silence_duration / 0.1)
 
-        frames         = []
-        silent_count   = 0
-        recording      = False
+        frames = []
+        silent_count = 0
+        recording = False
 
-        print("En attente de parole...", end="", flush=True)
+        print("Waiting for speech...", end="", flush=True)
 
         with sd.InputStream(samplerate=self.sample_rate, channels=1, dtype="float32", blocksize=chunk_size) as stream:
 
@@ -35,7 +35,7 @@ class SpeechToText:
 
                 if rms > silence_threshold:
                     if not recording:
-                        print("\rEnregistrement...      ", end="", flush=True)
+                        print("\Listening...      ", end="", flush=True)
                         recording = True
                     frames.append(chunk)
                     silent_count = 0
@@ -47,8 +47,6 @@ class SpeechToText:
                     if silent_count >= silent_chunks:
                         break
                 
-
-        print()
         return np.concatenate(frames, axis=0).flatten() if frames else np.array([])
 
 

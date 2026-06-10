@@ -8,19 +8,13 @@ class PiperTTS:
     SAMPLE_RATE = 22050
 
     def __init__(self, model: str, speaker: int = None, speed: float = 1.0):
-        """
-        model   : chemin vers le fichier .onnx
-        speaker : index du speaker (voix multi-speaker)
-        speed   : vitesse de lecture (length_scale, 1.0 = normal)
-        """
+
         self.speaker = speaker
-        self.speed   = speed
+        self.speed = speed
 
-        print(f"Chargement de la voix Piper '{model}'...")
+        print(f"Loading piper voice'{model}'...")
         self.voice = PiperVoice.load(model)
-        print("Voix chargée.\n")
-
-    # ─── Internal ──────────────────────────────────────────────────────────────
+        print("voice loaded.\n")
 
     def _synthesize(self, text: str) -> np.ndarray:
         from piper.config import SynthesisConfig
@@ -28,6 +22,7 @@ class PiperTTS:
             speaker_id=self.speaker,
             length_scale=self.speed,
         )
+        
         chunks = []
         for audio_chunk in self.voice.synthesize(text, syn_config=config):
             chunks.append(np.frombuffer(audio_chunk.audio_int16_bytes, dtype=np.int16))
@@ -36,7 +31,6 @@ class PiperTTS:
             return np.array([], dtype=np.int16)
 
         return np.concatenate(chunks)
-    # ─── Public ────────────────────────────────────────────────────────────────
 
     def textToSpeech(self, text: str) -> None:
         audio = self._synthesize(text)
