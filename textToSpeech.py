@@ -1,47 +1,46 @@
-import subprocess
 import sounddevice as sd
 import numpy as np
+from piper import PiperVoice
+from piper.config import SynthesisConfig
 
 class PiperTTS:
 
-    def __init__(self, piper_bin: str, model: str, speaker: int = None, speed: float = 1.0):
-        self.piper_bin = piper_bin
-        self.model     = model
-        self.speaker   = speaker
-        self.speed     = speed
+    SAMPLE_RATE = 22050
 
-    def _synthesize(self, text: str, speed: float = None, speaker: int = None) -> bytes:
+    def __init__(self, model: str, speaker: int = None, speed: float = 1.0):
         """
-        call piper binary and get an audio file
+        model   : chemin vers le fichier .onnx
+        speaker : index du speaker (voix multi-speaker)
+        speed   : vitesse de lecture (length_scale, 1.0 = normal)
         """
-        cmd = [
-            self.piper_bin,
-            "--model",
-            self.model,
-            "--output_raw",
-            "--length_scale",
-            str(speed or self.speed),
-        ]
+        self.speaker = speaker
+        self.speed   = speed
 
-        if (speaker or self.speaker) is not None:
-            cmd += ["--speaker", str(speaker or self.speaker)]
+        print(f"Chargement de la voix Piper '{model}'...")
+        self.voice = PiperVoice.load(model)
+        print("Voix chargée.\n")
 
-        result = subprocess.run(
-            cmd,
-            input=text.encode("utf-8"),
-            capture_output=True,
+    # ─── Internal ──────────────────────────────────────────────────────────────
+
+    def _synthesize(self, text: str) -> np.ndarray:
+        from piper.config import SynthesisConfig
+        config = SynthesisConfig(
+            speaker_id=self.speaker,
+            length_scale=self.speed,
         )
+        chunks = []
+        for audio_chunk in self.voice.synthesize(text, syn_config=config):
+            chunks.append(np.frombuffer(audio_chunk.audio_int16_bytes, dtype=np.int16))
 
-        if result.returncode != 0:
-            raise RuntimeError(f"Piper error : {result.stderr.decode()}")
+        if not chunks:
+            return np.array([], dtype=np.int16)
 
-        return result.stdout
-    
-    def _playPCM(self, pcmBytes):
-        audio = np.frombuffer(pcmBytes, dtype=np.int16)
-        sd.play(audio, samplerate=22050)
+        return np.concatenate(chunks)
+    # ─── Public ────────────────────────────────────────────────────────────────
+
+    def textToSpeech(self, text: str) -> None:
+        audio = self._synthesize(text)
+        if audio.size == 0:
+            return
+        sd.play(audio, samplerate=self.voice.config.sample_rate)
         sd.wait()
-    
-    def textToSpeech(self, text : str):
-        self._playPCM(self._synthesize(text))
-        

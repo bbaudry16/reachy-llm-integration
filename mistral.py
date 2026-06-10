@@ -1,14 +1,14 @@
 import os
 import time
 import requests
-
+import json
 
 class MistralClient:
 
     API_URL = "https://api.mistral.ai/v1/chat/completions"
     MODEL   = "mistral-small-2503"
 
-    def __init__(self, systemPrompt: str, APIKey: str = None, maxTokens: int = 256, temperature: float = 0.7, historySize: int = 20, rateLimit: float = 1.1):
+    def __init__(self, systemPrompt: str, APIKey: str = None, maxTokens: int = 512, temperature: float = 0.7, historySize: int = 10, rateLimit: float = 1.1):
 
         self.APIKey       = APIKey or os.environ.get("MISTRAL_APIKey")
         self.systemPrompt = systemPrompt
@@ -37,19 +37,15 @@ class MistralClient:
         if len(self.history) > self.historySize:
             self.history = self.history[-self.historySize:]
 
-    def ask(self, user_message: str) -> str:
+    def ask(self, user_message: str) -> dict:
         self._waitRateLimit()
 
-        headers = {
-            "Authorization": f"Bearer {self.APIKey}",
-            "Content-Type":  "application/json",
-        }
-        
+        headers = {"Authorization": f"Bearer {self.APIKey}", "Content-Type": "application/json"}
         payload = {
             "model":       self.MODEL,
             "messages":    self._buildMessages(user_message),
-            "max_tokens":  self.maxTokens,
             "temperature": self.temperature,
+            "response_format": {"type": "json_object"},  # force le JSON
         }
 
         self._lastRequestTime = time.time()
@@ -58,10 +54,15 @@ class MistralClient:
             print(response.json())
             response.raise_for_status()
 
-        reply = response.json()["choices"][0]["message"]["content"]
-        self._updateHistory(user_message, reply)
+        raw = response.json()["choices"][0]["message"]["content"]
 
-        return reply
+        try:
+            result = json.loads(raw)
+        except json.JSONDecodeError:
+            result = {"speech": raw, "ryi": "reachy:\n- wait:\n    duration: 0.1"}
+
+        self._updateHistory(user_message, result.get("speech", ""))
+        return result
 
     def clearHistory(self) -> None:
         self.history = []

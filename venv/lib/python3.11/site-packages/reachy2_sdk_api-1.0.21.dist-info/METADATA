@@ -1,0 +1,17 @@
+Metadata-Version: 2.4
+Name: reachy2_sdk_api
+Version: 1.0.21
+Summary: gRPC Protobuf API definition for Reachy 2 SDK
+Home-page: https://github.com/pollen-robotics/reachy2-sdk-api
+Author: Pollen Robotics
+Author-email: contact@pollen-robotics.com
+Description-Content-Type: text/markdown
+Requires-Dist: grpcio<=1.73.1,>=1.59.0
+Requires-Dist: grpcio-tools<=1.73.1,>=1.59.0
+Requires-Dist: protobuf<=6.32.0,>=4.25.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
