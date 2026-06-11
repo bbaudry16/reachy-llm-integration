@@ -10,7 +10,7 @@ class MistralClient:
 
     def __init__(self, systemPrompt: str, APIKey: str = None, maxTokens: int = 512, temperature: float = 0.7, historySize: int = 10, rateLimit: float = 1.1):
 
-        self.APIKey = APIKey or os.environ.get("MISTRAL_APIKey")
+        self.APIKey = APIKey or os.environ.get("MISTRAL_API_KEY")
         self.systemPrompt = systemPrompt
         self.maxTokens = maxTokens
         self.temperature = temperature

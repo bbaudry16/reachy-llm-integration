@@ -246,8 +246,8 @@ if __name__ == "__main__":
 
     reachyC = reachy.ReachyController.instanciate("10.59.1.20")#10.59.1.20
     piper = PiperTTS(MODEL_LOCALISATION, SPEAKER_ID, 1)
-    client = MistralClient(systemPrompt=SYSTEM_PROMPT, APIKey="bqOf6A5e1Sm08TqO4gd9M3DKWZhG5rNF")
-    stt    = SpeechToText(model="small", language="fr")
+    client = MistralClient(systemPrompt=SYSTEM_PROMPT)
+    stt    = SpeechToText(model="small", language="")
 
     reachyC.turnOn()
 
@@ -265,6 +265,7 @@ if __name__ == "__main__":
         result = client.ask(user_input)
         speech = result.get("speech", "")
         ryi    = result.get("ryi", "")
+
 
         print(f"Reachy : {speech}")
         print(f"RYI :\n{ryi}\n")
