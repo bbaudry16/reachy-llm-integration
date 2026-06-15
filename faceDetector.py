@@ -46,7 +46,7 @@ class FaceTracker:
 
             h, w = frame.shape[:2]
             gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            faces = self._detector.detectMultiScale(gray, 1.1, 5, minSize=(60, 60))
+            faces = self._detector.detectMultiScale(gray, 1.1, 5, minSize=(16, 16))
 
             #take only the closest head
             if len(faces) > 0:
