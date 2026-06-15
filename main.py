@@ -3,6 +3,11 @@ from mistral import MistralClient
 from speechToText import SpeechToText
 import libs.reachyController as reachy
 
+
+import threading
+import time
+from faceDetector import FaceTracker
+
 MODEL_LOCALISATION : str = "./model/en_GB-semaine-medium.onnx"
 SPEAKER_ID : int = 3
 
@@ -255,7 +260,7 @@ reachy:
 - capture:
     as: lhand
     action:
-      get_hand_position:
+      get_hand_position:_face_center
         arm: left
 - look_at:
     target: $lhand
@@ -293,21 +298,73 @@ reachy:
 Respond ONLY with the JSON object, no extra text. ALWAYS IN ENGLISH."""
 
 
+def face_tracking_loop(reachyC, tracker, active_flag: threading.Event):
+    SMOOTHING = 0.3
+    current = [1.0, 0.0, 0.0]
+
+    while True:
+        if active_flag.is_set():
+            time.sleep(0.1)
+            continue
+
+        target = tracker.get_look_at_target()  # ← None ou [x, y, z] directement
+        if target is not None:
+            current = [
+                current[i] * SMOOTHING + target[i] * (1 - SMOOTHING)
+                for i in range(3)
+            ]
+            reachyC.head.lookAt(current, duration=0.25)
+
+        time.sleep(0.1)
+
+@reachy.actionRegistry.register_action("speak_a_text")
+def speakAText(executor, params):
+    if not reachy.Validator(params, "speak_a_text").require("text").validate():
+        return
+        
+    text = params["text"]
+    piper.textToSpeech(text)
+
+
+@reachy.actionRegistry.register_action("look_at_human")
+def look_at_human(executor, params):
+    if not reachy.Validator(params, "look_at_human").require("duration").require("timeout").require("fallback").validate():
+        return
+    duration = params.get("duration")
+    timeout  = params.get("timeout")
+    fallback = params.get("fallback")
+
+    target  = None
+    elapsed = 0.0
+    step    = 0.05
+
+    while elapsed < timeout:
+        target = tracker.get_look_at_target()
+        if target is not None:
+            break
+        time.sleep(step)
+        elapsed += step
+
+    if target is None:
+        target = fallback
+
+    executor.reachy.head.lookAt(target, duration=duration)
+
 if __name__ == "__main__":
-
-    @reachy.actionRegistry.register_action("speak_a_text")
-    def speakAText(executor, params):
-        if not reachy.Validator(params, "speak_a_text").require("text").validate():
-            return
-            
-        text = params["text"]
-        piper.textToSpeech(text)
-
 
     reachyC = reachy.ReachyController.instanciate("10.59.1.20")#10.59.1.20
     piper = PiperTTS(MODEL_LOCALISATION, SPEAKER_ID, 1)
     client = MistralClient(systemPrompt=SYSTEM_PROMPT)
     stt    = SpeechToText(model="small", language="")
+
+
+    tracker = FaceTracker(reachyC, 10)
+    tracker.start()
+
+    llm_active = threading.Event()
+
+    face_thread = threading.Thread(target=face_tracking_loop, args=(reachyC, tracker, llm_active), daemon=True)
+    face_thread.start()
 
     reachyC.turnOn()
 
@@ -334,9 +391,13 @@ if __name__ == "__main__":
         instructor = reachy.Instructor.loadFromString(ryi, reachyC)
         print(instructor.data)
         if not instructor.data:
+            llm_active.set()
             piper.textToSpeech(speech)
+            llm_active.clear() 
         else:
+            llm_active.set()
             instructor.execute()
+            llm_active.clear() 
     reachyC.armLeft._debug_placeHandOnTable(3)
     reachyC.armRight._debug_placeHandOnTable(3)
 

@@ -35,7 +35,7 @@ class SpeechToText:
 
                 if rms > silence_threshold:
                     if not recording:
-                        print("\Listening...      ", end="", flush=True)
+                        print("Listening... ", end="", flush=True)
                         recording = True
                     frames.append(chunk)
                     silent_count = 0
