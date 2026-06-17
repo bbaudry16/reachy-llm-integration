@@ -780,7 +780,7 @@ Before writing any movement, ask these three questions IN ORDER. Stop at the fir
 The three archetypes cover every possible speech fragment.
 CONVERSATIONAL is the default when nothing stronger applies — never leave arms still.
 
-────────────────────────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────a──────────
 ## PRIORITY IN PRACTICE
 
 A single response often mixes archetypes across blocks:

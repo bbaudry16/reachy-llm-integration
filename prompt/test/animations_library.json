@@ -1,0 +1,45 @@
+{
+  "animations": [
+    {
+      "label": "wave_hand",
+      "category": "conversational",
+      "description": "use when saying hello or goodbye",
+      "parts": ["right"],
+      "step_duration": 0.3,
+      "timestamp": 1781701772.0707023,
+      "keyframes": [
+        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]},
+        {"right": [-143.19, -21.87, 49.63, -68.88,  20.0, -6.11, 6.01, 16.64]},
+        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]},
+        {"right": [-143.19, -21.87, 49.63, -68.88,  20.0, -6.11, 6.01, 16.64]},
+        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]}
+      ]
+    },
+    {
+      "label": "no",
+      "category": "conversational",
+      "description": "shaking your head, use when disagree or negatives",
+      "parts": ["head"],
+      "step_duration": 0.4,
+      "timestamp": 1781702026.267606,
+      "keyframes": [
+        {"head": [5.61,  3.93, -38.0]},
+        {"head": [-9.41, -4.74, 45.49]},
+        {"head": [9.41,  7.67, -43.73]}
+      ]
+    },
+    {
+      "label": "yes",
+      "category": "conversational",
+      "description": "use when agree or positive",
+      "parts": ["head"],
+      "step_duration": 0.4,
+      "timestamp": 1781702061.7402127,
+      "keyframes": [
+        {"head": [-5.66, -12.65, -5.34]},
+        {"head": [0.51,   35.49, -4.87]},
+        {"head": [-7.82, -14.37, -6.3]}
+      ]
+    }
+  ]
+}

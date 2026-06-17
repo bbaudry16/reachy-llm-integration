@@ -1,0 +1,729 @@
+{
+  "arms": [
+    {
+      "purpose" : "conversation",
+      "label": "neutral",
+      "description": "use when neutral or when you don't know better",
+      "timestamp": 1781615326.5790389,
+      "right": {
+        "position": [
+          0.402,
+          -0.201,
+          -0.325
+        ],
+        "orientation": [
+          39.2,
+          -88.4,
+          -38.8
+        ]
+      },
+      "left": {
+        "position": [
+          0.385,
+          0.243,
+          -0.325
+        ],
+        "orientation": [
+          -68.0,
+          -87.5,
+          68.7
+        ]
+      }
+    },
+    {
+      "purpose" : "emotion",
+      "label": "joy",
+      "description": "use when a little joyfull, like normal explanation or little talk",
+      "timestamp": 1781615372.2599282,
+      "right": {
+        "position": [
+          0.576,
+          -0.228,
+          -0.129
+        ],
+        "orientation": [
+          175.9,
+          -77.4,
+          -177.5
+        ]
+      },
+      "left": {
+        "position": [
+          0.563,
+          0.176,
+          -0.181
+        ],
+        "orientation": [
+          -165.5,
+          -79.8,
+          154.3
+        ]
+      }
+    },
+    {
+      "purpose" : "emotion",
+      "label": "happy",
+      "description": "use when happy or in a good mood",
+      "timestamp": 1781615416.7007337,
+      "right": {
+        "position": [
+          0.532,
+          -0.238,
+          0.254
+        ],
+        "orientation": [
+          -162.5,
+          -42.3,
+          160.1
+        ]
+      },
+      "left": {
+        "position": [
+          0.545,
+          0.238,
+          0.212
+        ],
+        "orientation": [
+          164.3,
+          -47.1,
+          -167.2
+        ]
+      }
+    },
+    {
+      "purpose" : "emotion",
+      "label": "excited",
+      "description": "use when very happy or excited",
+      "timestamp": 1781615453.9652078,
+      "right": {
+        "position": [
+          0.229,
+          -0.221,
+          0.536
+        ],
+        "orientation": [
+          -177.8,
+          -2.8,
+          173.0
+        ]
+      },
+      "left": {
+        "position": [
+          0.282,
+          0.214,
+          0.511
+        ],
+        "orientation": [
+          172.0,
+          -9.0,
+          -176.0
+        ]
+      }
+    },
+    {
+      "purpose" : "emotion",
+      "label": "suprised",
+      "description": "use when suprised or veeeery happy, carefull don't go too fast, arm very high and very open",
+      "timestamp": 1781615515.3582363,
+      "right": {
+        "position": [
+          0.16,
+          -0.395,
+          0.514
+        ],
+        "orientation": [
+          -177.7,
+          -3.0,
+          126.0
+        ]
+      },
+      "left": {
+        "position": [
+          0.172,
+          0.458,
+          0.462
+        ],
+        "orientation": [
+          169.3,
+          -7.6,
+          -117.8
+        ]
+      }
+    },
+    {
+      "purpose" : "emotion",
+      "label": "thinking",
+      "description": "use when thinking, arm right close to head like and left neutral",
+      "timestamp": 1781615605.9681349,
+      "right": {
+        "position": [
+          0.157,
+          -0.047,
+          0.127
+        ],
+        "orientation": [
+          -150.4,
+          27.5,
+          163.0
+        ]
+      },
+      "left": {
+        "position": [
+          0.416,
+          0.203,
+          -0.278
+        ],
+        "orientation": [
+          80.8,
+          -80.3,
+          -89.2
+        ]
+      }
+    },
+    {
+      "label": "sad",
+      "description": "use when sad or low, arm low",
+      "timestamp": 1781615638.0565963,
+      "right": {
+        "position": [
+          0.342,
+          -0.19,
+          -0.52
+        ],
+        "orientation": [
+          5.9,
+          -54.7,
+          -0.7
+        ]
+      },
+      "left": {
+        "position": [
+          0.314,
+          0.197,
+          -0.539
+        ],
+        "orientation": [
+          -5.6,
+          -47.1,
+          -2.8
+        ]
+      }
+    },
+    {
+      "label": "defeated",
+      "description": "use when deafeted, arm very low",
+      "timestamp": 1781615671.8011558,
+      "right": {
+        "position": [
+          0.203,
+          -0.2,
+          -0.611
+        ],
+        "orientation": [
+          4.4,
+          -26.5,
+          0.2
+        ]
+      },
+      "left": {
+        "position": [
+          0.2,
+          0.183,
+          -0.61
+        ],
+        "orientation": [
+          -8.0,
+          -30.6,
+          -1.2
+        ]
+      }
+    },
+    {
+      "label": "interested",
+      "description": "use when curious, or opening to someone, both arm close to head",
+      "timestamp": 1781615718.8181176,
+      "right": {
+        "position": [
+          0.146,
+          -0.116,
+          0.124
+        ],
+        "orientation": [
+          -146.7,
+          41.8,
+          164.0
+        ]
+      },
+      "left": {
+        "position": [
+          0.137,
+          0.097,
+          0.134
+        ],
+        "orientation": [
+          137.2,
+          30.3,
+          173.3
+        ]
+      }
+    },
+    {
+      "label": "encouraging",
+      "description": "use when encouraging or beeing very greatful, arm up the head",
+      "timestamp": 1781615840.3482378,
+      "right": {
+        "position": [
+          0.031,
+          -0.15,
+          0.452
+        ],
+        "orientation": [
+          -174.9,
+          46.3,
+          170.4
+        ]
+      },
+      "left": {
+        "position": [
+          0.056,
+          0.177,
+          0.435
+        ],
+        "orientation": [
+          155.6,
+          64.8,
+          164.9
+        ]
+      }
+    },
+    {
+      "label": "extrodinary",
+      "description": "use when something is incredible, extrodinary, arm very open, don't go too fast there",
+      "timestamp": 1781616032.5844896,
+      "right": {
+        "position": [
+          0.436,
+          -0.531,
+          -0.075
+        ],
+        "orientation": [
+          -160.0,
+          -68.0,
+          127.2
+        ]
+      },
+      "left": {
+        "position": [
+          0.439,
+          0.489,
+          -0.164
+        ],
+        "orientation": [
+          96.6,
+          -70.7,
+          -86.5
+        ]
+      }
+    },
+    {
+      "label": "pointing_sky_right",
+      "description": "pointing sky to the right",
+      "timestamp": 1781616076.0494463,
+      "right": {
+        "position": [
+          0.434,
+          -0.323,
+          0.425
+        ],
+        "orientation": [
+          -157.6,
+          -23.6,
+          129.4
+        ]
+      },
+      "left": {
+        "position": [
+          0.427,
+          0.217,
+          -0.317
+        ],
+        "orientation": [
+          -66.8,
+          -87.0,
+          51.1
+        ]
+      }
+    },
+    {
+      "label": "pointing_front",
+      "description": "pointing in front of you",
+      "timestamp": 1781616128.1307635,
+      "right": {
+        "position": [
+          0.642,
+          -0.245,
+          0.018
+        ],
+        "orientation": [
+          83.7,
+          -84.1,
+          -82.5
+        ]
+      },
+      "left": {
+        "position": [
+          0.421,
+          0.208,
+          -0.257
+        ],
+        "orientation": [
+          140.4,
+          -80.9,
+          -158.7
+        ]
+      }
+    },
+    {
+      "label": "hello",
+      "description": "saying hello with right arm",
+      "timestamp": 1781616158.9879827,
+      "right": {
+        "position": [
+          0.233,
+          -0.288,
+          0.507
+        ],
+        "orientation": [
+          173.4,
+          -3.7,
+          -167.4
+        ]
+      },
+      "left": {
+        "position": [
+          0.42,
+          0.208,
+          -0.258
+        ],
+        "orientation": [
+          140.5,
+          -81.0,
+          -159.0
+        ]
+      }
+    },
+    {
+      "label": "looking",
+      "description": "looking the horizon, arm right close to head",
+      "timestamp": 1781616191.9083476,
+      "right": {
+        "position": [
+          0.102,
+          -0.005,
+          0.273
+        ],
+        "orientation": [
+          107.0,
+          73.5,
+          19.7
+        ]
+      },
+      "left": {
+        "position": [
+          0.42,
+          0.208,
+          -0.258
+        ],
+        "orientation": [
+          139.9,
+          -80.9,
+          -158.5
+        ]
+      }
+    },
+    {
+      "label": "explain_1",
+      "description": "pose when explaining something, choose between all explain pose",
+      "timestamp": 1781616248.205411,
+      "right": {
+        "position": [
+          0.511,
+          -0.024,
+          -0.156
+        ],
+        "orientation": [
+          -119.5,
+          -73.9,
+          150.5
+        ]
+      },
+      "left": {
+        "position": [
+          0.402,
+          0.302,
+          0.199
+        ],
+        "orientation": [
+          -165.9,
+          -5.6,
+          153.5
+        ]
+      }
+    },
+    {
+      "label": "explain_2",
+      "description": "explain something, choose between all explain pose",
+      "timestamp": 1781616278.910189,
+      "right": {
+        "position": [
+          0.22,
+          -0.188,
+          0.242
+        ],
+        "orientation": [
+          -172.2,
+          22.0,
+          169.4
+        ]
+      },
+      "left": {
+        "position": [
+          0.413,
+          0.056,
+          -0.087
+        ],
+        "orientation": [
+          126.2,
+          -37.2,
+          -178.0
+        ]
+      }
+    },
+    {
+      "label": "explain_3",
+      "description": "explain something, choose between all pose",
+      "timestamp": 1781616313.0229435,
+      "right": {
+        "position": [
+          0.399,
+          -0.048,
+          -0.207
+        ],
+        "orientation": [
+          -134.7,
+          -75.9,
+          176.2
+        ]
+      },
+      "left": {
+        "position": [
+          0.274,
+          -0.071,
+          -0.029
+        ],
+        "orientation": [
+          91.0,
+          -60.5,
+          169.2
+        ]
+      }
+    }
+  ],
+  "head": [
+    {
+      "label": "neutral",
+      "description": "use when neutral or don't know better",
+      "timestamp": 1781616356.7440794,
+      "look_at": [
+        0.997,
+        -0.046,
+        -0.064
+      ]
+    },
+    {
+      "label": "happy",
+      "description": "use when happy or joyfull",
+      "timestamp": 1781616374.640257,
+      "look_at": [
+        0.984,
+        -0.027,
+        0.177
+      ]
+    },
+    {
+      "label": "excited",
+      "description": "use when excited or very happy, can be use to watch the sky or above",
+      "timestamp": 1781616406.1131387,
+      "look_at": [
+        0.929,
+        -0.036,
+        0.368
+      ]
+    },
+    {
+      "label": "sad",
+      "description": "use when sad or depressed, looking down",
+      "timestamp": 1781616426.8495975,
+      "look_at": [
+        0.853,
+        -0.016,
+        -0.521
+      ]
+    },
+    {
+      "label": "deafeted",
+      "description": "use when very depressed or looking very down",
+      "timestamp": 1781616447.8579307,
+      "look_at": [
+        0.534,
+        -0.021,
+        -0.845
+      ]
+    },
+    {
+      "label": "curious_0",
+      "description": "use when curious and interested",
+      "timestamp": 1781616468.7064226,
+      "look_at": [
+        0.998,
+        0.054,
+        0.023
+      ]
+    },
+    {
+      "label": "curious_1",
+      "description": "use when genually interested or curious about something niche",
+      "timestamp": 1781616505.2351692,
+      "look_at": [
+        0.982,
+        -0.184,
+        0.039
+      ]
+    },
+    {
+      "label": "thinking",
+      "description": "use to think",
+      "timestamp": 1781616522.5075903,
+      "look_at": [
+        0.971,
+        -0.149,
+        0.188
+      ]
+    },
+    {
+      "label": "shy",
+      "description": "shy about something",
+      "timestamp": 1781616538.1718745,
+      "look_at": [
+        0.457,
+        -0.872,
+        -0.178
+      ]
+    },
+    {
+      "label": "angry",
+      "description": "use when angry at someone or looking behind",
+      "timestamp": 1781616599.4373636,
+      "look_at": [
+        -0.19,
+        0.979,
+        0.079
+      ]
+    },
+    {
+      "label": "crazy",
+      "description": "when goofing around or crazy",
+      "timestamp": 1781616621.8618796,
+      "look_at": [
+        0.94,
+        0.04,
+        0.34
+      ]
+    },
+    {
+      "label": "looking_right",
+      "description": "looking at your right",
+      "timestamp": 1781616648.2622643,
+      "look_at": [
+        0.546,
+        -0.837,
+        -0.047
+      ]
+    },
+    {
+      "label": "looking_left",
+      "description": "looking at you left",
+      "timestamp": 1781616666.0387087,
+      "look_at": [
+        0.657,
+        0.753,
+        0.044
+      ]
+    }
+  ],
+  "antennas": [
+    {
+      "label": "neutral",
+      "description": "use when neutral or don't know better",
+      "timestamp": 1781616687.4872665,
+      "left": -0.2,
+      "right": -3.1
+    },
+    {
+      "label": "happy",
+      "description": "use when happy or joyfull",
+      "timestamp": 1781616707.6635184,
+      "left": 24.5,
+      "right": -26.5
+    },
+    {
+      "label": "excited",
+      "description": "use when excited or cute",
+      "timestamp": 1781616735.3521485,
+      "left": 60.8,
+      "right": -64.7
+    },
+    {
+      "label": "curious",
+      "description": "use when curious or confused",
+      "timestamp": 1781616759.2164805,
+      "left": 15.7,
+      "right": -106.3
+    },
+    {
+      "label": "thinking",
+      "description": "use to think or relate",
+      "timestamp": 1781616786.6969209,
+      "left": 106.9,
+      "right": 28.9
+    },
+    {
+      "label": "angry",
+      "description": "use when angry or annoyed",
+      "timestamp": 1781616818.7139678,
+      "left": 119.8,
+      "right": -114.8
+    },
+    {
+      "label": "sad",
+      "description": "use when sad or crying",
+      "timestamp": 1781616845.554333,
+      "left": -150.0,
+      "right": -39.4
+    },
+    {
+      "label": "panicing",
+      "description": "use when panic",
+      "timestamp": 1781616871.97071,
+      "left": -64.7,
+      "right": 64.1
+    },
+    {
+      "label": "crazy",
+      "description": "use when goofying around",
+      "timestamp": 1781616891.8669755,
+      "left": 28.0,
+      "right": 132.1
+    }
+  ]
+}

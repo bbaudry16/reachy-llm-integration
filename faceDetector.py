@@ -7,6 +7,8 @@ import math
 
 class FaceTracker:
 
+    MAX_FACE_COUNT : int = 5
+
     def __init__(self, reachyController : "ReachyController", fps: float = 10.0,fov_h_deg: float = 125.0, fov_v_deg: float = 93.0, zoomLevel : "ZoomLevel" = ZoomLevel.OUT):
         self._reachy = reachyController
         self._detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
@@ -17,6 +19,8 @@ class FaceTracker:
         self._thread = None
         self._fov_h = fov_h_deg
         self._fov_v = fov_v_deg
+        
+        self.faceCount : int = 0
 
         self._reachy.head.setCameraZoomLevel(ZoomLevel.OUT)
 
@@ -34,6 +38,8 @@ class FaceTracker:
         with self._lock:
             return self._faceCenter
 
+
+    
     def _loop(self):
         interval = 1.0 / self._fps
         while self._running:
@@ -41,14 +47,22 @@ class FaceTracker:
 
             frame = self._reachy.head.cameraLeft.last_frame
             if frame is None:
+                
+                self.faceCount -= 1
+                if self.faceCount < 0:
+                    self.faceCount = 0
+                
                 time.sleep(interval)
+                continue
+                
+            self.faceCount += 1 
+
+            if self.faceCount < FaceTracker.MAX_FACE_COUNT:
                 continue
 
             h, w = frame.shape[:2]
             gray  = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             faces = self._detector.detectMultiScale(gray, 1.1, 5, minSize=(16, 16))
-
-            #take only the closest head
             if len(faces) > 0:
                 x, y, fw, fh = max(faces, key=lambda f: f[2] * f[3])
                 cx_norm = ((x + fw / 2) / w - 0.5) * 2
