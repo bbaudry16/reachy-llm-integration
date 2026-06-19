@@ -4,42 +4,203 @@
       "label": "wave_hand",
       "category": "conversational",
       "description": "use when saying hello or goodbye",
-      "parts": ["right"],
+      "parts": [
+        "right"
+      ],
       "step_duration": 0.3,
       "timestamp": 1781701772.0707023,
       "keyframes": [
-        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]},
-        {"right": [-143.19, -21.87, 49.63, -68.88,  20.0, -6.11, 6.01, 16.64]},
-        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]},
-        {"right": [-143.19, -21.87, 49.63, -68.88,  20.0, -6.11, 6.01, 16.64]},
-        {"right": [-143.19, -21.87, 49.63, -68.88, -20.0, -6.11, 6.01, 16.64]}
+        {
+          "right": [
+            -120,
+            0,
+            40,
+            -58,
+            -3,
+            -2,
+            -2,
+            17
+          ]
+        },
+        {
+          "right": [
+            -120,
+            0,
+            -40,
+            -58,
+            -3,
+            -2,
+            -2,
+            17
+          ]
+        },
+        {
+          "right": [
+            -120,
+            0,
+            40,
+            -58,
+            -3,
+            -2,
+            -2,
+            17
+          ]
+        },
+        {
+          "right": [
+            -120,
+            0,
+            -40,
+            -58,
+            -3,
+            -2,
+            -2,
+            17
+          ]
+        }
       ]
     },
     {
       "label": "no",
       "category": "conversational",
       "description": "shaking your head, use when disagree or negatives",
-      "parts": ["head"],
-      "step_duration": 0.4,
+      "parts": [
+        "head"
+      ],
+      "step_duration": 0.6,
       "timestamp": 1781702026.267606,
       "keyframes": [
-        {"head": [5.61,  3.93, -38.0]},
-        {"head": [-9.41, -4.74, 45.49]},
-        {"head": [9.41,  7.67, -43.73]}
+        {
+          "head": [
+            0.0,
+            0.0,
+            -40.0
+          ]
+        },
+        {
+          "head": [
+            0.0,
+            0.0,
+            45.0
+          ]
+        },
+        {
+          "head": [
+            0.0,
+            0.0,
+            -40.0
+          ]
+        }
       ]
     },
     {
       "label": "yes",
       "category": "conversational",
       "description": "use when agree or positive",
-      "parts": ["head"],
-      "step_duration": 0.4,
+      "parts": [
+        "head"
+      ],
+      "step_duration": 0.6,
       "timestamp": 1781702061.7402127,
       "keyframes": [
-        {"head": [-5.66, -12.65, -5.34]},
-        {"head": [0.51,   35.49, -4.87]},
-        {"head": [-7.82, -14.37, -6.3]}
+        {
+          "head": [
+            0.0,
+            -12.0,
+            0.0
+          ]
+        },
+        {
+          "head": [
+            0.0,
+            35.0,
+            0.0
+          ]
+        },
+        {
+          "head": [
+            0.0,
+            -12.0,
+            0.0
+          ]
+        }
       ]
+    },
+    {
+      "label": "down_straight_right",
+      "category": "explanation",
+      "description": "move right hand from up do bottom, use when falling, drawing horizontal line, explaining something that go up to down",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 1.0,
+      "timestamp": 1781874699.1046596,
+      "keyframes": [
+        {
+          "right": [
+            -92.99,
+            -0.59,
+            6.2,
+            -75.65,
+            -7.87,
+            60.0,
+            -0.15,
+            16.79
+          ]
+        },
+        {
+          "right": [
+            -24.5,
+            -1.73,
+            2.24,
+            -63.52,
+            2.51,
+            -7.52,
+            5.43,
+            16.79
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "line_up_to_down_right"
+    },
+    {
+      "label": "up_straight_right",
+      "category": "explanation",
+      "description": "go from down to up, use when going from down to up, drawing an horizontal line, explaining rise everything that is linear and down to up",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 1.0,
+      "timestamp": 1781874827.4910827,
+      "keyframes": [
+        {
+          "right": [
+            -24.42,
+            -1.82,
+            2.24,
+            -63.52,
+            2.51,
+            -7.52,
+            5.43,
+            16.79
+          ]
+        },
+        {
+          "right": [
+            -84.64,
+            -1.91,
+            1.98,
+            -84.09,
+            -10.15,
+            61.76,
+            4.25,
+            16.79
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "line_down_to_up_right"
     }
   ]
 }

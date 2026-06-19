@@ -73,6 +73,7 @@ def print_capture(idx, data):
 
 
 def main():
+    import libs.reachyController as reachy
     print("Connecting to Reachy...")
     reachyC = reachy.ReachyController.instanciate("10.59.1.20")
 

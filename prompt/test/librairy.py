@@ -45,9 +45,23 @@ STEP 2 — Pick poses from the matching category ONLY:
   CONVERSATIONAL → poses marked [conversational]
 
 STEP 3 — Build the parallel block:
-  1. ARMS  → move_joints, right AND left, from library ONLY
-             OR move_joints_sequence for multi-pose arm animation
-  2. HEAD  → move_head from library, OR look_at_human, OR move_head_sequence
+
+  BEFORE ADDING ANY ACTION — check the animation library above.
+  If you use play_animation, read its "parts" field first, then:
+
+    parts includes "right" → DO NOT add move_joints arm:right
+    parts includes "left"  → DO NOT add move_joints arm:left
+    parts includes "head"  → DO NOT add move_head or move_head_sequence
+
+  Adding move_joints for a part already covered by the animation
+  causes violent uncontrolled shaking. This is a physical safety rule.
+
+  Then add the remaining parts:
+  1. ARMS  → move_joints for each arm NOT covered by any animation in this block
+             OR move_joints_sequence for multi-pose motion
+             OR play_animation (replaces move_joints for its covered parts)
+  2. HEAD  → move_head, look_at_human, OR move_head_sequence
+             SKIP if an animation in this block covers "head"
   3. ANT   → set_antenna from library, OR vibrate_antenna for intensity peaks
   4. TEXT  → speak_a_text, 11 words maximum
 
@@ -299,7 +313,7 @@ def build_animations_prompt(anim_lib=None) -> str:
             keyframes = len(a.get("keyframes", []))
             dur       = round(keyframes * step, 1) if keyframes > 0 else "?"
             parts     = ", ".join(a.get("parts", []))
-            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:{parts}")
+            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:[{parts}]  ← NO move_joints/move_head for these parts")
             if a.get("description"):
                 lines.append(f"    {'':20} → {a['description']}")
         lines.append("")
@@ -310,19 +324,27 @@ def build_animations_prompt(anim_lib=None) -> str:
         "        name: \"label_here\"",
         "        speed: 1.0        ← optional, default 1.0",
         "",
-        "  play_animation runs fully in parallel with speak_a_text, set_antenna,",
-        "  and vibrate_antenna. Use it INSTEAD of move_joints for the parts it covers.",
-        "  Do NOT add move_joints for the same arm in the same parallel block.",
-        "  You MUST still add move_joints for any arm NOT covered by the animation.",
+        "  !! HARD RULE — MOTOR CONFLICT — CAUSES VIOLENT SHAKING IF BROKEN !!",
+        "  Each animation declares which parts it covers (the 'parts' field above).",
+        "  NEVER add move_joints or move_head for a part already covered by the",
+        "  animation in the same parallel block. Two actions on the same motors",
+        "  fight each other and cause violent shaking.",
         "",
-        "  Example — animation covers right arm only, left arm still needs move_joints:",
+        "    parts: [right]       → NO move_joints arm:right in the same block",
+        "    parts: [left]        → NO move_joints arm:left in the same block",
+        "    parts: [head]        → NO move_head or move_head_sequence in the same block",
+        "    parts: [right, left] → NO move_joints for either arm in the same block",
+        "",
+        "  You MUST still add move_joints for every part NOT listed in parts.",
+        "",
+        "  Example — wave_hand covers parts:[right] only:",
         "    - parallel:",
         "        - speak_a_text:",
         "            text: \"Hello there!\"",
         "        - play_animation:",
-        "            name: \"hello_wave\"",
+        "            name: \"wave_hand\"    ← covers right → NO move_joints arm:right",
         "        - move_joints:",
-        "            arm: left",
+        "            arm: left            ← left not covered → REQUIRED",
         "            joints: [-0.86, 2.61, 1.71, -73.54, -0.22, -6.2, -0.73, -18.7]",
         "            duration: 1.6",
         "        - set_antenna:",
@@ -332,6 +354,29 @@ def build_animations_prompt(anim_lib=None) -> str:
         "        - set_antenna:",
         "            antenna: right",
         "            angle: -26",
+        "            duration: 0.5",
+        "",
+        "  Example — no/yes cover parts:[head] only:",
+        "    - parallel:",
+        "        - speak_a_text:",
+        "            text: \"No!\"",
+        "        - play_animation:",
+        "            name: \"no\"           ← covers head → NO move_head",
+        "        - move_joints:",
+        "            arm: right           ← right not covered → REQUIRED",
+        "            joints: [-40.86, -1.12, 2.15, -80.84, 3.47, 7.16, -1.03, 16.35]",
+        "            duration: 1.2",
+        "        - move_joints:",
+        "            arm: left            ← left not covered → REQUIRED",
+        "            joints: [-41.38, 3.32, 2.59, -80.22, 2.51, -0.22, -0.73, -18.7]",
+        "            duration: 1.2",
+        "        - set_antenna:",
+        "            antenna: left",
+        "            angle: 120",
+        "            duration: 0.5",
+        "        - set_antenna:",
+        "            antenna: right",
+        "            angle: -115",
         "            duration: 0.5",
         "",
     ]
