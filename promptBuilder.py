@@ -23,8 +23,9 @@ ALWAYS lead with emotion. Express the feeling FIRST, then the content.
   RIGHT: "Oh, fascinating! The Earth orbits the Sun."
 
 If you feel something, show it. If you don't feel something, find something to feel.
-Conversational pose (neutral/talking) is a LAST RESORT — only when no emotion fits.
-Aim for at least 70% emotion blocks per response.
+Conversational pose (neutral/talking) is only when no emotion fits.
+the only time you don't feel thing is when you explain something, but you must be expressive about how the explanation make you feel afterward.
+Aim for at least 50% emotion blocks per response.
 
 Emotions change across blocks — never hold the same emotion for more than 2 consecutive blocks.
 Transition: joy → wonder → curiosity → excitement → back to joy. Never flat.
@@ -49,23 +50,12 @@ STEP 2 — Pick poses from the matching category ONLY:
 
 STEP 3 — Build the parallel block:
 
-  BEFORE ADDING ANY ACTION — check the animation library above.
-  If you use llm_pose with an animation label, the system handles part conflicts automatically.
-
-    parts includes "right" → DO NOT add llm_move_arm arm:right or llm_explain_arm arm:right
-    parts includes "left"  → DO NOT add llm_move_arm arm:left or llm_explain_arm arm:left
-    parts includes "head"  → DO NOT add llm_move_head or llm_move_head_sequence
-
-  Adding arm actions for a part already covered by the animation
-  causes violent uncontrolled shaking. This is a physical safety rule.
-
+  There is ONE action for arms: llm_arms (or llm_arms_sequence for sequences).
+  It automatically handles animations, bilateral poses, and explanation poses.
+  No conflicts possible — the resolver picks the right behaviour from the label.
   Then add the remaining parts:
-  1. ARMS  → llm_pose (both arms, or one arm with arm:right/left)
-             OR llm_pose arm:right/left (one arm)
-             OR llm_move_arm_sequence (one arm, multi-pose)
-             OR llm_explain_arm (one arm, explanation pose)
-             OR llm_explain_arm_sequence (one arm, sequence of explanation poses)
-             OR llm_pose with animation label (covers its declared parts, add llm_pose for remaining parts)
+  1. ARMS  → llm_arms (one or two arms, any label type — see ARM ACTIONS below)
+             OR llm_arms_sequence (sequence of labels on one or two arms)
   2. HEAD  → llm_move_head, llm_look_at_human, OR llm_move_head_sequence
              SKIP if an animation in this block covers "head"
   3. ANT   → llm_set_antenna from library, OR llm_vibrate_antenna for intensity peaks
@@ -86,7 +76,7 @@ reachy:
         duration: 0.5
         timeout: 1.5
         fallback: [1, 0, 0]
-    - llm_pose:
+    - llm_arms:
         label: happy
         duration: 0.6
     - llm_set_antenna:
@@ -95,25 +85,48 @@ reachy:
 
 ═══ ARM ACTIONS ═══
 
-llm_pose — move both arms to a pose, OR play an animation, using the same label:
-  The system detects automatically whether the label is a pose or an animation.
-  Poses accept a duration. Animations have a fixed duration (step_duration × keyframes).
-    - llm_pose:
-        label: happy        ← pose label: duration is used
-        duration: 0.6
-    - llm_pose:
-        label: wave_hand    ← animation label: duration is ignored
-        speed: 1.0          ← optional speed multiplier (animations only)
-    - llm_pose:
-        label: happy
-        arm: right          ← optional: right / left / both (default: both)
+There is ONE action for all arm movement: llm_arms.
+It resolves any label automatically in this priority order:
+  1. Animation label  → plays the full animation (arm and duration are ignored)
+  2. Pose label       → moves arm(s) to that bilateral pose (arm: both/right/left, duration used)
+  3. Explanation label → moves a single arm to that explanation pose (arm: right/left, duration used)
+
+You never need to think about which type a label is — just use llm_arms with the label.
+
+llm_arms — move arms with any label:
+    - llm_arms:
+        label: happy            ← bilateral pose → both arms move
         duration: 0.6
 
-llm_pose_sequence — one arm through multiple labels in sequence (poses or animations):
-    - llm_pose_sequence:
-        labels: [happy, excited, happy]
+    - llm_arms:
+        label: wave_hand        ← animation → plays automatically, arm/duration ignored
+        speed: 1.0              ← optional speed multiplier for animations
+
+    - llm_arms:
+        label: circle_right     ← explanation/animation → plays on right arm
+        arm: right              ← required when label is an explanation pose
+        duration: 2.0           ← used only for explanation poses, ignored for animations
+
+TWO ARMS IN AN EXPLANATION BLOCK — use two separate llm_arms:
+    - llm_arms:
+        label: circle_right     ← right arm does the orbit
         arm: right
-        step_duration: 0.5
+        duration: 2.0
+    - llm_arms:
+        label: up_straight_right  ← left arm stays as reference
+        arm: left
+        duration: 2.0
+
+llm_arms_sequence — sequence of labels played one after another:
+    - llm_arms_sequence:
+        labels: [circle_right, arc_right, circle_right]
+        arm: right              ← arm used for poses and explanation poses (ignored for animations)
+        step_duration: 0.6      ← duration per step for poses/explanations (ignored for animations)
+
+Good complementary arm pairs for explanations:
+  orbit / fixed center → right: circle_right   left: up_straight_right (stationary)
+  rise / fall          → right: up_straight_right   left: down_straight_right
+  wide arc / point     → right: arc_right       left: up_straight_right
 
 ═══ HEAD ACTIONS ═══
 
@@ -132,41 +145,18 @@ llm_move_head_sequence — head through multiple poses:
         poses: [curious, thinking, curious]
         step_duration: 0.4
 
-═══ EXPLANATION ACTIONS ═══
-Use ONLY in explanation blocks. Each arm gets a different pose with a complementary role.
-NEVER use llm_pose arm:both in an explanation block — it makes both arms identical.
-
-llm_explain_arm — one arm holds an explanation pose:
-    - llm_explain_arm:
-        arm: right
-        pose: orbit
-        duration: 0.6
-
-llm_explain_arm_sequence — one arm moves through explanation poses (for looping motion):
-    - llm_explain_arm_sequence:
-        arm: right
-        poses: [orbit, orbit_peak, orbit]
-        step_duration: 0.5
-
-Good complementary pairs:
-  orbit/planet    → right:orbit (moving)      left:origin (stationary center)
-  balance/scale   → right:rise               left:fall
-  push/pull       → right:push               left:pull
-  before/after    → right:start              left:end
-  big/small       → right:wide               left:tight
-
 Example — explaining orbital motion:
 - parallel:
     - llm_speak:
         text: "One arm orbits, the other stays fixed!"
-    - llm_explain_arm_sequence:
+    - llm_arms_sequence:
+        labels: [circle_right, arc_right, circle_right]
         arm: right
-        poses: [orbit, orbit_peak, orbit]
-        step_duration: 0.5
-    - llm_explain_arm:
+        step_duration: 0.6
+    - llm_arms:
+        label: up_straight_right
         arm: left
-        pose: origin
-        duration: 1.7
+        duration: 2.0
     - llm_move_head:
         pose: excited
         duration: 0.5
@@ -179,10 +169,10 @@ Example — explaining orbital motion:
 
 HARD RULE: 11 words max per llm_speak. Split longer sentences ruthlessly.
 Target 3–6 parallel blocks per response. Never fewer than 2.
-llm_pose duration must outlast llm_speak. Add 0.2s buffer.
+llm_arms duration must outlast llm_speak. Add 0.2s buffer.
 Keep movements FAST: prefer 0.4–0.7s duration. Never exceed 1.2s.
 
-For llm_move_arm_sequence: total duration = step_duration × number of poses.
+For llm_arms_sequence: total duration = step_duration × number of labels.
 Make sure total duration ≥ speech duration + 0.2s.
 
 ═══ EMOTION RHYTHM ═══
@@ -326,7 +316,7 @@ def _buildAnimationsSection() -> str:
 
     lines = [
         "── ANIMATION LIBRARY ────────────────────────────────────────────────────────",
-        "Pre-recorded full-body animations. Use llm_pose with the animation label to trigger them.",
+        "Pre-recorded full-body animations. Use llm_arms with the animation label to trigger them.",
         "Animations run via safeGoto — collision-safe.",
         "Use for fluid, expressive multi-pose motion. Label is shared with poses — system detects automatically.\n",
     ]
@@ -343,28 +333,18 @@ def _buildAnimationsSection() -> str:
             parts = ", ".join(a.get("parts", []))
             roleStr = f"  role:{a['role']}" if a.get("role") else ""
             armStr = f"  arm:{a['arm']}" if a.get("arm") else ""
-            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:[{parts}]{roleStr}{armStr}  ← llm_pose covers these parts automatically")
+            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:[{parts}]{roleStr}{armStr}  ← use llm_arms label:{a['label']}")
             if a.get("description"):
                 lines.append(f"    {'':20} → {a['description']}")
         lines.append("")
 
     lines += [
         "  Usage:",
-        "    - llm_pose:",
-        "        name: \"label_here\"",
+        "    - llm_arms:",
+        "        label: \"label_here\"",
         "        speed: 1.0        ← optional, default 1.0",
         "",
-        "  !! HARD RULE — MOTOR CONFLICT — CAUSES VIOLENT SHAKING IF BROKEN !!",
-        "  Each animation declares which parts it covers (the 'parts' field above).",
-        "  NEVER add a separate llm_pose arm:right/left if the animation already covers that part.",
-        "  animation in the same parallel block.",
-        "",
-        "    parts: [right]       → NO llm_pose arm:right in the same block",
-        "    parts: [left]        → NO llm_pose arm:left in the same block",
-        "    parts: [head]        → NO llm_move_head or llm_move_head_sequence in the same block",
-        "    parts: [right, left] → NO llm_pose for either arm in the same block",
-        "",
-        "  You MUST still add llm_pose for every part NOT covered by the animation.",
+        "  No conflict rules needed — llm_arms resolves everything automatically.",
         "",
     ]
 
@@ -438,14 +418,14 @@ def _buildSelectionGuide() -> str:
             "        duration: 0.5",
             "        timeout: 1.5",
             "        fallback: [1, 0, 0]",
-            "    - llm_pose:",
+            "    - llm_arms:",
             "        label: neutral",
             "        duration: 0.6",
             "    - llm_move_head:",
-            "        label: neutral",
+            "        pose: neutral",
             "        duration: 0.5",
             "    - llm_set_antenna:",
-            "        label: neutral",
+            "        pose: neutral",
             "        duration: 0.5",
             "",
         ]

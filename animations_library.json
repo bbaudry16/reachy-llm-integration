@@ -201,6 +201,456 @@
       ],
       "arm": "right",
       "role": "line_down_to_up_right"
+    },
+    {
+      "label": "arc_right",
+      "category": "explanation",
+      "description": "large circle arc in exterior, use when drawing curves, or use this with both arm when something is big",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.6,
+      "timestamp": 1782114994.2657914,
+      "keyframes": [
+        {
+          "right": [
+            -57.65,
+            -42.7,
+            -16.31,
+            -93.41,
+            -42.68,
+            61.41,
+            9.53,
+            14.74
+          ]
+        },
+        {
+          "right": [
+            -31.98,
+            -37.43,
+            -22.2,
+            -81.45,
+            -21.32,
+            36.88,
+            29.47,
+            15.76
+          ]
+        },
+        {
+          "right": [
+            -7.54,
+            -0.06,
+            -5.23,
+            -86.99,
+            -2.95,
+            13.23,
+            21.26,
+            15.76
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "arc_right"
+    },
+    {
+      "label": "circle_right",
+      "category": "explanation",
+      "description": "drawing a circle, use when drawing orbit or rotation",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.7,
+      "timestamp": 1782115100.5562418,
+      "keyframes": [
+        {
+          "right": [
+            0.02,
+            -4.9,
+            -3.38,
+            -109.93,
+            -8.48,
+            17.36,
+            -14.52,
+            15.47
+          ]
+        },
+        {
+          "right": [
+            -13.78,
+            -15.62,
+            -12.18,
+            -83.74,
+            -19.3,
+            7.69,
+            12.46,
+            15.47
+          ]
+        },
+        {
+          "right": [
+            -29.34,
+            -1.47,
+            -9.01,
+            -69.41,
+            0.57,
+            6.73,
+            7.77,
+            15.47
+          ]
+        },
+        {
+          "right": [
+            -8.59,
+            0.02,
+            12.26,
+            -92.09,
+            -1.8,
+            10.51,
+            -11.58,
+            15.47
+          ]
+        },
+        {
+          "right": [
+            12.16,
+            -2.0,
+            -4.35,
+            -98.51,
+            -5.14,
+            0.66,
+            11.58,
+            15.47
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "circle_right"
+    },
+    {
+      "label": "hand_flat_horizontal",
+      "category": "explanation",
+      "description": "use when drawing a horizontal surface, describing a level or showing a horizontal line or anything horizontal and flat",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.5,
+      "timestamp": 1782133917.0756202,
+      "keyframes": [
+        {
+          "right": [
+            -6.22,
+            -4.64,
+            -24.48,
+            -79.87,
+            -5.67,
+            1.19,
+            3.37,
+            15.47
+          ]
+        },
+        {
+          "right": [
+            -6.57,
+            0.9,
+            29.41,
+            -82.95,
+            0.92,
+            1.01,
+            3.37,
+            15.47
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "hand_flat_horizontal"
+    },
+    {
+      "label": "hand_flat_vertical",
+      "category": "explanation",
+      "description": "use when drawing a vertical flat surface, cutting through something, showing an vertical line or anything flat and vertical",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.6,
+      "timestamp": 1782134064.1902187,
+      "keyframes": [
+        {
+          "right": [
+            -56.5,
+            1.96,
+            1.27,
+            -103.43,
+            87.16,
+            -7.69,
+            11.58,
+            15.76
+          ]
+        },
+        {
+          "right": [
+            -50.35,
+            -2.0,
+            1.45,
+            -27.91,
+            87.16,
+            -1.1,
+            2.79,
+            15.62
+          ]
+        },
+        {
+          "right": [
+            -52.11,
+            -1.82,
+            -1.98,
+            -89.45,
+            87.16,
+            -2.86,
+            2.79,
+            15.76
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "hand_flat_vertical"
+    },
+    {
+      "label": "pushing",
+      "category": "explanation",
+      "description": "puhsing something forward, use when pushing, applying a force or anything related to force pushing",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.6,
+      "timestamp": 1782134183.4643335,
+      "keyframes": [
+        {
+          "right": [
+            40.29,
+            1.34,
+            -0.13,
+            -124.62,
+            2.95,
+            1.1,
+            8.36,
+            -54.47
+          ]
+        },
+        {
+          "right": [
+            -34.44,
+            0.02,
+            -0.66,
+            -53.49,
+            3.21,
+            -3.82,
+            5.43,
+            -54.62
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "pushing"
+    },
+    {
+      "label": "grabing",
+      "category": "explanation",
+      "description": "grabing something and pulling it, use when grabing something, apply force to pull, or anything that require closing the gripper and pulling",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.6,
+      "timestamp": 1782134272.4259424,
+      "keyframes": [
+        {
+          "right": [
+            -47.8,
+            -0.15,
+            3.74,
+            -39.08,
+            -8.48,
+            -7.16,
+            13.34,
+            -54.62
+          ]
+        },
+        {
+          "right": [
+            -47.89,
+            0.2,
+            2.68,
+            -40.92,
+            31.6,
+            -6.9,
+            3.67,
+            13.86
+          ]
+        },
+        {
+          "right": [
+            41.61,
+            0.02,
+            1.71,
+            -123.56,
+            20.0,
+            -7.16,
+            9.82,
+            13.86
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "grabbing"
+    },
+    {
+      "label": "pulling",
+      "category": "explanation",
+      "description": "pulling something without grabbing it, use when applying a force to pull, showing a vertical mouvement or anything that require pulling",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.6,
+      "timestamp": 1782134346.2993252,
+      "keyframes": [
+        {
+          "right": [
+            -36.37,
+            -1.03,
+            0.22,
+            -57.71,
+            5.85,
+            3.47,
+            5.13,
+            14.88
+          ]
+        },
+        {
+          "right": [
+            39.94,
+            -0.77,
+            2.42,
+            -123.65,
+            4.44,
+            -2.24,
+            5.13,
+            15.03
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "pulling"
+    },
+    {
+      "label": "swing_left_to_right",
+      "category": "explanation",
+      "description": "swinging left to right, use when showing a lot of thing, selecting something, pointing all people and anything thzt require a large circular mouvement forward",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.9,
+      "timestamp": 1782134470.7175646,
+      "keyframes": [
+        {
+          "right": [
+            -75.76,
+            12.33,
+            17.01,
+            -64.22,
+            -14.29,
+            61.67,
+            3.08,
+            11.36
+          ]
+        },
+        {
+          "right": [
+            -70.57,
+            -34.44,
+            -1.54,
+            -66.86,
+            -10.59,
+            61.41,
+            2.79,
+            10.34
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "swing_left_to_right"
+    },
+    {
+      "label": "zigzag",
+      "category": "explanation",
+      "description": "showing chaos, sinusoidal, back and force or anything zigzagy",
+      "parts": [
+        "right"
+      ],
+      "step_duration": 0.7,
+      "timestamp": 1782134543.8548887,
+      "keyframes": [
+        {
+          "right": [
+            -50.26,
+            5.47,
+            20.44,
+            -88.75,
+            -2.59,
+            44.79,
+            7.77,
+            10.34
+          ]
+        },
+        {
+          "right": [
+            -31.27,
+            -0.86,
+            -15.87,
+            -85.14,
+            -18.77,
+            42.51,
+            4.25,
+            10.34
+          ]
+        },
+        {
+          "right": [
+            -25.91,
+            3.89,
+            14.29,
+            -74.59,
+            8.66,
+            32.13,
+            2.79,
+            10.34
+          ]
+        },
+        {
+          "right": [
+            -17.47,
+            -0.68,
+            -20.7,
+            -60.26,
+            -17.8,
+            27.3,
+            3.67,
+            10.34
+          ]
+        },
+        {
+          "right": [
+            -17.21,
+            3.1,
+            12.62,
+            -43.21,
+            5.58,
+            10.95,
+            3.67,
+            10.34
+          ]
+        }
+      ],
+      "arm": "right",
+      "role": "swing_left_to_right"
     }
   ]
 }

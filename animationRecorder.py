@@ -195,10 +195,11 @@ def main() -> None:
     print("  R=right  L=left  H=head  SPACE=capture keyframe")
     print("  ENTER=finish+save  U=undo  P=preview  C=clear  D=summary  Q=quit\n")
     printSummary(lib)
+    reachyC.fans.turnOnAll()
 
     while True:
         key = getKey()
-
+        reachyC.fans.tick()
         if key in ("r", "R"):
             stiff["right"] = not stiff["right"]
             setStiff(rightJoints, stiff["right"])
@@ -291,6 +292,7 @@ def main() -> None:
             saveLibrary(lib)
             print("\nSaved. Quitting.")
             reachyC.reachy.turn_off("reachy")
+            reachyC.fans.turnOffAll()
             break
 
 

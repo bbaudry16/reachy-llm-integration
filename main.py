@@ -6,8 +6,11 @@ from textToSpeech import TextToSpeech
 from speechToText import SpeechToText
 from mistral import MistralClient
 from faceDetector import FaceTracker
-from actions import ActionContext, registerActions
+from actions import ActionContext
 from promptBuilder import buildSystemPrompt
+
+from yamlTimingFixer import YamlTimingFixer 
+from actions import ActionContext, registerContext
 
 MODEL_PATH = "./model/en_GB-semaine-medium.onnx"
 SPEAKER_ID = 3
@@ -47,16 +50,16 @@ if __name__ == "__main__":
     stt = SpeechToText(model="small", language="")
 
     tracker = None
-    if USE_VOICE and REACHY_IP != "10.59.1.20":
+    if USE_VOICE and REACHY_IP != "localhost":
         tracker = FaceTracker(reachyC, 10)
         tracker.start()
 
-    ctx = ActionContext(piper=tts, tracker=tracker)
-    registerActions(ctx, reachyLib.actionRegistry.ACTION_REGISTRY)
+    registerContext(ActionContext(piper=tts, tracker=tracker))
 
     systemPrompt = buildSystemPrompt()
     client = MistralClient(systemPrompt=systemPrompt)
-
+    timing_fixer = YamlTimingFixer(verbose=True)
+    
     llmActive = threading.Event()
 
     if tracker is not None:
@@ -66,7 +69,7 @@ if __name__ == "__main__":
     reachyC.turnOn()
     running = True
 
-    while False:
+    while running:
         if USE_VOICE:
             userInput = stt.listen(silenceThreshold=0.03, silenceDuration=1.5)
         else:
@@ -83,8 +86,11 @@ if __name__ == "__main__":
         result = client.ask(userInput)
         speech = result.get("speech", "")
         ryi = result.get("ryi", "")
-
+        ryi = timing_fixer.fix(ryi)
         print(ryi)
+
+        prompt = buildSystemPrompt()
+        print(f"System prompt length: {len(prompt)} chars")
 
         instructor = reachyLib.Instructor.loadFromString(ryi, reachyC)
 
