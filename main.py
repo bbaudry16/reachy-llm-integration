@@ -1,6 +1,7 @@
 import threading
 import time
 
+from pynput import keyboard as pynput_keyboard
 import libs.reachyController as reachyLib
 from textToSpeech import TextToSpeech
 from speechToText import SpeechToText
@@ -44,6 +45,21 @@ def faceTrackingLoop(reachyC, tracker: FaceTracker, pauseFlag: threading.Event) 
         time.sleep(FACE_UPDATE_INTERVAL)
 
 
+STOP_KEY = pynput_keyboard.Key.enter
+
+
+def _startStopKeyListener(stopFlag: threading.Event) -> pynput_keyboard.Listener:
+    """Lance un listener clavier en daemon qui set stopFlag sur STOP_KEY."""
+    def onPress(key):
+        if key == STOP_KEY:
+            print("\n[keyboard] Echap presse — arret en cours...", flush=True)
+            stopFlag.set()
+            return False
+    listener = pynput_keyboard.Listener(on_press=onPress, daemon=True)
+    listener.start()
+    return listener
+
+
 if __name__ == "__main__":
     reachyC = reachyLib.ReachyController.instanciate(REACHY_IP)
     tts = TextToSpeech(MODEL_PATH, SPEAKER_ID, 1)
@@ -60,6 +76,10 @@ if __name__ == "__main__":
     client = MistralClient(systemPrompt=systemPrompt)
     timing_fixer = YamlTimingFixer(verbose=True)
     
+    stopFlag = threading.Event()
+    _startStopKeyListener(stopFlag)
+    print("[main] appuie sur Echap pour arreter", flush=True)
+
     llmActive = threading.Event()
 
     if tracker is not None:
@@ -67,20 +87,22 @@ if __name__ == "__main__":
         faceThread.start()
 
     reachyC.turnOn()
-    running = True
 
-    while running:
+    while not stopFlag.is_set():
         if USE_VOICE:
             userInput = stt.listen(silenceThreshold=0.03, silenceDuration=1.5)
         else:
             userInput = input("you: ")
+
+        if stopFlag.is_set():
+            break
 
         reachyC.fans.tick()
 
         if not userInput:
             continue
         if userInput in STOP_WORDS:
-            running = False
+            stopFlag.set()
             continue
 
         result = client.ask(userInput)

@@ -8,3 +8,4 @@ reachy_sdk==0.5.4
 Requests==2.34.2
 scipy==1.7.3
 sounddevice==0.5.5
+pynput>=1.7.6

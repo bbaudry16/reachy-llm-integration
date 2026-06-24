@@ -5,6 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 import libs.reachyController as reachyLib
 import poseLibrary
 import animationLibrary
+import poseVariation
 
 
 @dataclass
@@ -80,7 +81,7 @@ def _claimedHead(action: dict) -> bool:
     name = _actionName(action)
     if name in _HEAD_ACTIONS:
         return True
-    # Animation that moves head also claims it
+
     if name in _ARM_ACTIONS:
         params = _actionParams(action)
         label = params.get("label") or (params.get("labels") or [None])[0]
@@ -115,10 +116,6 @@ def _safeParallelFilter(params: list) -> list:
     return safe
 
 
-# ── Arms internals ────────────────────────────────────────────────────────────
-
-# Indices in JOINT_ORDER whose sign must flip for a left-arm mirror:
-# shoulder_roll(1), arm_yaw(2), forearm_yaw(4), wrist_roll(6)
 _MIRROR_INDICES = {1, 2, 4, 6}
 
 
@@ -171,13 +168,15 @@ def _playArmPose(reachyC, label: str, arm: str, duration: float) -> None:
         return
     if data["min_duration"] is not None:
         duration = max(duration, data["min_duration"])
+    rightJoints = poseVariation.applyVariation(data["right"], "right")
+    leftJoints  = poseVariation.applyVariation(data["left"],  "left")
     def moveRight():
         if reachyC.armRight.canMove:
-            jd = dict(zip(reachyC.armRight.getJointsInOrder(), data["right"]))
+            jd = dict(zip(reachyC.armRight.getJointsInOrder(), rightJoints))
             reachyC.armRight.safeGoto(jd, duration)
     def moveLeft():
         if reachyC.armLeft.canMove:
-            jd = dict(zip(reachyC.armLeft.getJointsInOrder(), data["left"]))
+            jd = dict(zip(reachyC.armLeft.getJointsInOrder(), leftJoints))
             reachyC.armLeft.safeGoto(jd, duration)
     if arm == "both":
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -197,7 +196,9 @@ def _playExplainPose(reachyC, label: str, arm: str, duration: float) -> None:
     reachyArm = reachyC.armRight if arm == "right" else reachyC.armLeft
     if not reachyArm.canMove:
         return
-    jd = dict(zip(reachyArm.getJointsInOrder(), data["joints"]))
+    side = "right" if arm == "right" else "left"
+    joints = poseVariation.applyVariation(data["joints"], side)
+    jd = dict(zip(reachyArm.getJointsInOrder(), joints))
     reachyArm.safeGoto(jd, duration)
 
 
@@ -215,9 +216,6 @@ def _resolveArms(reachyC, label: str, arm: str, duration: float, speed: float) -
     if arm in ("right", "left"):
         _playExplainPose(reachyC, label, arm, duration)
 
-
-# ── Control actions ───────────────────────────────────────────────────────────
-
 @reachyLib.register_control_action("parallel")
 def safeParallel(executor, params: list) -> None:
     if not isinstance(params, list):
@@ -227,9 +225,6 @@ def safeParallel(executor, params: list) -> None:
         futures = [pool.submit(executor.executeInstruction, action) for action in safe]
         for future in futures:
             future.result()
-
-
-# ── Actions ───────────────────────────────────────────────────────────────────
 
 @reachyLib.register_action("llm_speak")
 def llmSpeak(executor, params: dict) -> None:
@@ -282,8 +277,6 @@ def llmArmsSequence(executor, params: dict) -> None:
         _resolveArms(executor.reachy, label, arm, stepDuration, speed)
 
 
-# ── Legacy aliases ────────────────────────────────────────────────────────────
-
 @reachyLib.register_action("llm_pose")
 def llmPose(executor, params: dict) -> None:
     llmArms(executor, params)
@@ -306,8 +299,6 @@ def llmExplainArmSequence(executor, params: dict) -> None:
     labels = params.get("poses", params.get("labels", []))
     llmArmsSequence(executor, {**params, "labels": labels})
 
-
-# ── Head ──────────────────────────────────────────────────────────────────────
 
 @reachyLib.register_action("llm_move_head")
 def llmMoveHead(executor, params: dict) -> None:
@@ -334,8 +325,6 @@ def llmMoveHeadSequence(executor, params: dict) -> None:
         executor.reachy.head.gotoHeadAngles(angles, stepDuration)
 
 
-# ── Antennas ──────────────────────────────────────────────────────────────────
-
 @reachyLib.register_action("llm_set_antenna")
 def llmSetAntenna(executor, params: dict) -> None:
     pose = params.get("pose")
@@ -346,6 +335,7 @@ def llmSetAntenna(executor, params: dict) -> None:
     if data is None:
         return
     leftAngle, rightAngle = data
+    leftAngle, rightAngle = poseVariation.applyAntennaVariation(leftAngle, rightAngle)
     reachyLib.ACTION_REGISTRY["set_antenna"](executor, {"antenna": "left", "angle": leftAngle, "duration": duration})
     reachyLib.ACTION_REGISTRY["set_antenna"](executor, {"antenna": "right", "angle": rightAngle, "duration": duration})
 

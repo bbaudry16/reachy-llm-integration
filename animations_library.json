@@ -7,7 +7,7 @@
       "parts": [
         "right"
       ],
-      "step_duration": 0.3,
+      "step_duration": 0.7,
       "timestamp": 1781701772.0707023,
       "keyframes": [
         {
@@ -62,7 +62,7 @@
     },
     {
       "label": "no",
-      "category": "conversational",
+      "category": "emotion",
       "description": "shaking your head, use when disagree or negatives",
       "parts": [
         "head"
@@ -95,7 +95,7 @@
     },
     {
       "label": "yes",
-      "category": "conversational",
+      "category": "emotion",
       "description": "use when agree or positive",
       "parts": [
         "head"
