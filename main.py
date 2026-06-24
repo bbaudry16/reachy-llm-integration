@@ -15,8 +15,8 @@ from actions import ActionContext, registerContext
 
 MODEL_PATH = "./model/en_GB-semaine-medium.onnx"
 SPEAKER_ID = 3
-REACHY_IP = "localhost"
-USE_VOICE = False
+REACHY_IP = "10.59.1.20"
+USE_VOICE = True
 
 STOP_WORDS = ["stop", "Stop.", "Stop", "stop..", "Stop ?"]
 
@@ -45,7 +45,7 @@ def faceTrackingLoop(reachyC, tracker: FaceTracker, pauseFlag: threading.Event) 
         time.sleep(FACE_UPDATE_INTERVAL)
 
 
-STOP_KEY = pynput_keyboard.Key.enter
+STOP_KEY = pynput_keyboard.Key.esc
 
 
 def _startStopKeyListener(stopFlag: threading.Event) -> pynput_keyboard.Listener:
