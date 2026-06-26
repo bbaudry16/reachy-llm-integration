@@ -220,6 +220,13 @@ Two antenna actions:
 
 
 def _groupByCategory(entries: list[dict]) -> dict[str, list[dict]]:
+    """
+    Group a list of pose entries by their category field.
+
+    @param entries: List of pose dicts.
+    @type entries: list
+    @rtype: dict
+    """
     groups: dict = {}
     for e in entries:
         cat = e.get("category", "conversational")
@@ -228,6 +235,11 @@ def _groupByCategory(entries: list[dict]) -> dict[str, list[dict]]:
 
 
 def _buildPosesSection() -> str:
+    """
+    Build the poses section of the system prompt from the current library.
+
+    @rtype: str
+    """
     lines = [
         "═══ POSE LIBRARY ═══",
         "Poses are grouped by category. Pick ONLY from the category matching your fragment type.\n",
@@ -308,6 +320,11 @@ def _buildPosesSection() -> str:
 
 
 def _buildAnimationsSection() -> str:
+    """
+    Build the animations section of the system prompt from the current library.
+
+    @rtype: str
+    """
     anims = (animationLibrary.listByCategory("emotion")
              + animationLibrary.listByCategory("conversational")
              + animationLibrary.listByCategory("explanation"))
@@ -333,16 +350,16 @@ def _buildAnimationsSection() -> str:
             parts = ", ".join(a.get("parts", []))
             roleStr = f"  role:{a['role']}" if a.get("role") else ""
             armStr = f"  arm:{a['arm']}" if a.get("arm") else ""
-            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:[{parts}]{roleStr}{armStr}  ← use llm_arms label:{a['label']}")
+            lines.append(f"    {a['label']:<20} duration:{dur}s  parts:[{parts}]{roleStr}{armStr}  <- use llm_arms label:{a['label']}")
             if a.get("description"):
-                lines.append(f"    {'':20} → {a['description']}")
+                lines.append(f"    {'':20} -> {a['description']}")
         lines.append("")
 
     lines += [
         "  Usage:",
         "    - llm_arms:",
         "        label: \"label_here\"",
-        "        speed: 1.0        ← optional, default 1.0",
+        "        speed: 1.0        <- optional, default 1.0",
         "",
         "  No conflict rules needed — llm_arms resolves everything automatically.",
         "",
@@ -352,6 +369,11 @@ def _buildAnimationsSection() -> str:
 
 
 def _buildSelectionGuide() -> str:
+    """
+    Build the pose selection guide section of the system prompt.
+
+    @rtype: str
+    """
     emotionArms = [e["label"] for e in poseLibrary.listByCategory("arms", "emotion")]
     convArms = [e["label"] for e in poseLibrary.listByCategory("arms", "conversational")]
     emotionHeads = [e["label"] for e in poseLibrary.listByCategory("head", "emotion")]
@@ -435,6 +457,11 @@ def _buildSelectionGuide() -> str:
 
 
 def buildSystemPrompt() -> str:
+    """
+    Assemble and return the full system prompt for the LLM.
+
+    @rtype: str
+    """
     posesSection = _buildPosesSection()
     animsSection = _buildAnimationsSection()
     return PROMPT_HEAD + posesSection + ("\n" + animsSection if animsSection else "") + PROMPT_YML + _buildSelectionGuide()

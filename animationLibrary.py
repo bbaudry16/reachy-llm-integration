@@ -22,10 +22,24 @@ def _load() -> dict:
 
 
 def getAnimation(label: str) -> dict | None:
+    """
+    Return the animation dict for the given label, or None if not found.
+
+    @param label: Animation label.
+    @type label: str
+    @rtype: dict or None
+    """
     return next((a for a in _load().get("animations", []) if a.get("label") == label), None)
 
 
 def getLockedParts(label: str) -> list[str]:
+    """
+    Return the list of body parts used by the given animation.
+
+    @param label: Animation label.
+    @type label: str
+    @rtype: list
+    """
     anim = getAnimation(label)
     if anim is None:
         return []
@@ -33,10 +47,18 @@ def getLockedParts(label: str) -> list[str]:
 
 
 def listByCategory(category: str) -> list[dict]:
+    """
+    Return all animations matching the given category.
+
+    @param category: Category name (e.g. 'emotion', 'conversational').
+    @type category: str
+    @rtype: list
+    """
     return [a for a in _load().get("animations", []) if a.get("category") == category]
 
 
 def reload() -> None:
+    """Invalidate the cache and reload from disk."""
     global _cache
     _cache = None
     _load()

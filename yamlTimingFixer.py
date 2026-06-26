@@ -34,6 +34,14 @@ def _contains_slow_pose(block_text: str) -> bool:
 
 
 class YamlTimingFixer:
+    """
+    Corrects motion durations in LLM-generated YAML so they outlast speech.
+
+    For each parallel block, durations are bumped to at least
+    speech_duration + buffer. Slow poses (suprised, shocked) enforce
+    an additional minimum duration.
+    """
+
     def __init__(
         self,
         buffer: float = _SPEECH_BUFFER,
@@ -42,6 +50,18 @@ class YamlTimingFixer:
         slow_pose_min: float = _SLOW_POSES_MIN,
         verbose: bool = False,
     ):
+        """
+        @param buffer: Extra seconds added on top of speech duration.
+        @type buffer: float
+        @param min_duration: Absolute minimum motion duration in seconds.
+        @type min_duration: float
+        @param max_duration: Absolute maximum motion duration in seconds.
+        @type max_duration: float
+        @param slow_pose_min: Minimum duration enforced for slow poses.
+        @type slow_pose_min: float
+        @param verbose: Print corrections to stdout when True.
+        @type verbose: bool
+        """
         self.buffer       = buffer
         self.min_duration = min_duration
         self.max_duration = max_duration
@@ -50,9 +70,15 @@ class YamlTimingFixer:
 
         self._dur_re = re.compile(r'(duration:\s*)(\d+(?:\.\d+)?)')
 
-
     def fix(self, ryi: str) -> str:
- 
+        """
+        Apply timing corrections to the full YAML string.
+
+        @param ryi: Raw YAML string from the LLM.
+        @type ryi: str
+        @return: Corrected YAML string.
+        @rtype: str
+        """
         if not ryi or "parallel:" not in ryi:
             return ryi
 
@@ -72,7 +98,6 @@ class YamlTimingFixer:
         return fixed
 
     def _split_parallel_blocks(self, ryi: str) -> list[str]:
-
         positions = [m.start() for m in re.finditer(r'- parallel:', ryi)]
         if not positions:
             return [ryi]
@@ -108,13 +133,12 @@ class YamlTimingFixer:
         return self._bump_durations(block, required_dur)
 
     def _bump_durations(self, block: str, min_dur: float) -> str:
-
         def replacer(m: re.Match) -> str:
             prefix  = m.group(1)
             current = float(m.group(2))
             fixed = min(self.max_duration, max(min_dur, current))
             if fixed != current and self.verbose:
-                print(f"  [timing] duration {current:.2f}s → {fixed:.2f}s")
+                print(f"  [timing] duration {current:.2f}s -> {fixed:.2f}s")
             return f"{prefix}{fixed:.2f}"
 
         pattern = re.compile(r'(?<!step_)(duration:\s*)(\d+(?:\.\d+)?)')
@@ -153,5 +177,4 @@ if __name__ == "__main__":
 
     fixer = YamlTimingFixer(verbose=True)
     fixed = fixer.fix(sample)
-    print("\n── Fixed YAML ───────────────────────────────────────")
     print(fixed)

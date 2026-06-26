@@ -10,12 +10,12 @@ from faceDetector import FaceTracker
 from actions import ActionContext
 from promptBuilder import buildSystemPrompt
 
-from yamlTimingFixer import YamlTimingFixer 
+from yamlTimingFixer import YamlTimingFixer
 from actions import ActionContext, registerContext
 
 MODEL_PATH = "./model/en_GB-semaine-medium.onnx"
 SPEAKER_ID = 3
-REACHY_IP = "10.59.1.20"
+REACHY_IP = "localhost"
 USE_VOICE = True
 
 STOP_WORDS = ["stop", "Stop.", "Stop", "stop..", "Stop ?"]
@@ -26,6 +26,15 @@ FACE_MOVE_DURATION = 0.22
 
 
 def faceTrackingLoop(reachyC, tracker: FaceTracker, pauseFlag: threading.Event) -> None:
+    """
+    Continuously update Reachy's head to track the detected face.
+
+    @param reachyC: Reachy controller instance.
+    @param tracker: Running FaceTracker instance.
+    @type tracker: FaceTracker
+    @param pauseFlag: When set, tracking is paused.
+    @type pauseFlag: threading.Event
+    """
     current = [1.0, 0.0, 0.0]
     lookThread = None
 
@@ -49,10 +58,16 @@ STOP_KEY = pynput_keyboard.Key.esc
 
 
 def _startStopKeyListener(stopFlag: threading.Event) -> pynput_keyboard.Listener:
-    """Lance un listener clavier en daemon qui set stopFlag sur STOP_KEY."""
+    """
+    Start a keyboard listener that sets stopFlag when Escape is pressed.
+
+    @param stopFlag: Event to set on Escape key press.
+    @type stopFlag: threading.Event
+    @rtype: pynput_keyboard.Listener
+    """
     def onPress(key):
         if key == STOP_KEY:
-            print("\n[keyboard] Echap presse — arret en cours...", flush=True)
+            print("\n[keyboard] Escape pressed — stopping...", flush=True)
             stopFlag.set()
             return False
     listener = pynput_keyboard.Listener(on_press=onPress, daemon=True)
@@ -75,10 +90,10 @@ if __name__ == "__main__":
     systemPrompt = buildSystemPrompt()
     client = MistralClient(systemPrompt=systemPrompt)
     timing_fixer = YamlTimingFixer(verbose=True)
-    
+
     stopFlag = threading.Event()
     _startStopKeyListener(stopFlag)
-    print("[main] appuie sur Echap pour arreter", flush=True)
+    print("[main] press Escape to stop", flush=True)
 
     llmActive = threading.Event()
 

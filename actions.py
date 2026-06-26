@@ -10,6 +10,12 @@ import poseVariation
 
 @dataclass
 class ActionContext:
+    """
+    Shared runtime context passed to action handlers.
+
+    @ivar piper: Text-to-speech engine.
+    @ivar tracker: Face tracker instance, or None if disabled.
+    """
     piper: object
     tracker: object | None
 
@@ -18,6 +24,12 @@ _ctx: ActionContext | None = None
 
 
 def registerContext(ctx: ActionContext) -> None:
+    """
+    Register the global action context.
+
+    @param ctx: Context to register.
+    @type ctx: ActionContext
+    """
     global _ctx
     _ctx = ctx
 
@@ -93,6 +105,14 @@ def _claimedHead(action: dict) -> bool:
 
 
 def _safeParallelFilter(params: list) -> list:
+    """
+    Filter out actions that conflict on already-reserved body parts.
+
+    @param params: List of action dicts from a parallel block.
+    @type params: list
+    @return: Filtered list with conflicting actions removed.
+    @rtype: list
+    """
     reserved_arms: set = set()
     head_reserved: bool = False
     safe: list = []
@@ -120,7 +140,13 @@ _MIRROR_INDICES = {1, 2, 4, 6}
 
 
 def _mirrorJoints(joints: list) -> list:
-    """Return a mirrored copy of a right-arm joint list for the left arm."""
+    """
+    Return a mirrored copy of a right-arm joint list for the left arm.
+
+    @param joints: Right-arm joint values.
+    @type joints: list
+    @rtype: list
+    """
     return [-v if i in _MIRROR_INDICES else v for i, v in enumerate(joints)]
 
 
@@ -131,7 +157,6 @@ def _playAnimation(reachyC, anim: dict, speed: float, mirror: bool = False) -> N
     for kf in keyframes:
         targetsR = targetsL = targetsH = None
         if mirror:
-            # Play right-side animation on left arm with mirrored joints
             if "right" in parts and "right" in kf:
                 targetsL = dict(zip(reachyC.armLeft.getJointsInOrder(), _mirrorJoints(kf["right"])))
         else:
@@ -206,7 +231,6 @@ def _resolveArms(reachyC, label: str, arm: str, duration: float, speed: float) -
     anim = animationLibrary.getAnimation(label)
     if anim is not None:
         parts = anim.get("parts", [])
-        # Right-only animation requested on left arm → mirror
         mirror = (arm == "left" and "right" in parts and "left" not in parts)
         _playAnimation(reachyC, anim, speed, mirror=mirror)
         return

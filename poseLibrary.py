@@ -27,6 +27,13 @@ def _find(section: str, label: str) -> dict | None:
 
 
 def getArmPose(label: str) -> dict | None:
+    """
+    Return right/left joint lists and optional min_duration for the given arm pose.
+
+    @param label: Pose label.
+    @type label: str
+    @rtype: dict or None
+    """
     entry = _find("arms", label)
     if entry is None:
         return None
@@ -34,6 +41,13 @@ def getArmPose(label: str) -> dict | None:
 
 
 def getExplanationPose(label: str) -> dict | None:
+    """
+    Return the explanation pose data for the given label.
+
+    @param label: Pose label.
+    @type label: str
+    @rtype: dict or None
+    """
     entry = _find("arms", label)
     if entry is None or entry.get("category") != "explanation":
         return None
@@ -41,6 +55,13 @@ def getExplanationPose(label: str) -> dict | None:
 
 
 def getHeadPose(label: str) -> list | None:
+    """
+    Return the head angles for the given pose label.
+
+    @param label: Pose label.
+    @type label: str
+    @rtype: list or None
+    """
     entry = _find("head", label)
     if entry is None:
         return None
@@ -48,6 +69,13 @@ def getHeadPose(label: str) -> list | None:
 
 
 def getAntennaPose(label: str) -> tuple[float, float] | None:
+    """
+    Return (left, right) antenna angles for the given pose label.
+
+    @param label: Pose label.
+    @type label: str
+    @rtype: tuple or None
+    """
     entry = _find("antennas", label)
     if entry is None:
         return None
@@ -55,10 +83,20 @@ def getAntennaPose(label: str) -> tuple[float, float] | None:
 
 
 def listByCategory(section: str, category: str) -> list[dict]:
+    """
+    Return all entries in a section matching the given category.
+
+    @param section: Library section ('arms', 'head', 'antennas').
+    @type section: str
+    @param category: Category name.
+    @type category: str
+    @rtype: list
+    """
     return [e for e in _load().get(section, []) if e.get("category") == category]
 
 
 def reload() -> None:
+    """Invalidate the cache and reload from disk."""
     global _cache
     _cache = None
     _load()

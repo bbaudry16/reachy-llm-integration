@@ -1,12 +1,13 @@
 """
 Pose Capture Tool
+
 Controls:
-  1      → toggle stiff/compliant  RIGHT arm
-  2      → toggle stiff/compliant  LEFT arm
-  3      → toggle stiff/compliant  HEAD
-  SPACE  → capture current pose (arms + head look_at)
-  S      → save all captures to poses.json
-  Q      → quit
+  1      - toggle stiff/compliant RIGHT arm
+  2      - toggle stiff/compliant LEFT arm
+  3      - toggle stiff/compliant HEAD
+  SPACE  - capture current pose (arms + head look_at)
+  S      - save all captures to poses.json
+  Q      - quit
 """
 
 import json
@@ -16,6 +17,7 @@ import termios
 
 
 def get_key():
+    """Read a single keypress from stdin without echoing."""
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
     try:
@@ -26,12 +28,19 @@ def get_key():
 
 
 def set_stiff(joints, stiff: bool):
+    """Set compliance state for all joints in the dict."""
     for j in joints.values():
         j.compliant = not stiff
 
 
 def capture(reachyC):
-    # Arms — cartesian + orientation
+    """
+    Capture the current arm positions, orientations, and head look-at target.
+
+    @param reachyC: Reachy controller instance.
+    @return: Dict with 'right', 'left', and 'look_at' keys.
+    @rtype: dict
+    """
     rpos = reachyC.armRight.getHandPosition()
     lpos = reachyC.armLeft.getHandPosition()
 
@@ -44,7 +53,6 @@ def capture(reachyC):
     rwr, rfy = get_ori(reachyC.armRight)
     lwr, lfy = get_ori(reachyC.armLeft)
 
-    # Head — forward kinematic gives look_at [x, y, z]
     look = reachyC.head.forwardKinematic(distance=1.0)
 
     return {
@@ -61,6 +69,7 @@ def capture(reachyC):
 
 
 def print_capture(idx, data):
+    """Print a formatted summary of a captured pose."""
     r  = data["right"]["position"]
     ro = data["right"]["orientation"]
     l  = data["left"]["position"]
@@ -77,7 +86,6 @@ def main():
     print("Connecting to Reachy...")
     reachyC = reachy.ReachyController.instanciate("10.59.1.20")
 
-    # Start compliant (motors off)
     reachyC.reachy.turn_off("reachy")
 
     stiff = {"right": False, "left": False, "head": False}
@@ -89,12 +97,12 @@ def main():
     captures = []
 
     print("\nPose Capture — all parts start COMPLIANT (free to move)")
-    print("  1     → toggle RIGHT arm  stiff/compliant")
-    print("  2     → toggle LEFT arm   stiff/compliant")
-    print("  3     → toggle HEAD       stiff/compliant")
-    print("  SPACE → capture pose")
-    print("  S     → save to poses.json")
-    print("  Q     → quit\n")
+    print("  1     - toggle RIGHT arm  stiff/compliant")
+    print("  2     - toggle LEFT arm   stiff/compliant")
+    print("  3     - toggle HEAD       stiff/compliant")
+    print("  SPACE - capture pose")
+    print("  S     - save to poses.json")
+    print("  Q     - quit\n")
 
     while True:
         key = get_key()
@@ -103,19 +111,19 @@ def main():
             stiff["right"] = not stiff["right"]
             set_stiff(right_joints, stiff["right"])
             state = "STIFF" if stiff["right"] else "compliant"
-            print(f"  RIGHT arm → {state}")
+            print(f"  RIGHT arm -> {state}")
 
         elif key == '2':
             stiff["left"] = not stiff["left"]
             set_stiff(left_joints, stiff["left"])
             state = "STIFF" if stiff["left"] else "compliant"
-            print(f"  LEFT arm  → {state}")
+            print(f"  LEFT arm  -> {state}")
 
         elif key == '3':
             stiff["head"] = not stiff["head"]
             set_stiff(head_joints, stiff["head"])
             state = "STIFF" if stiff["head"] else "compliant"
-            print(f"  HEAD      → {state}")
+            print(f"  HEAD      -> {state}")
 
         elif key == ' ':
             data = capture(reachyC)

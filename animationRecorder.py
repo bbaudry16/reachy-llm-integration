@@ -12,6 +12,7 @@ JOINT_ORDER = ["shoulder_pitch", "shoulder_roll", "arm_yaw", "elbow_pitch", "for
 
 
 def getKey() -> str:
+    """Read a single keypress from stdin without echoing."""
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
     try:
@@ -22,17 +23,27 @@ def getKey() -> str:
 
 
 def getLine(prompt: str) -> str:
+    """Print a prompt and read a line from stdin."""
     sys.stdout.write(prompt)
     sys.stdout.flush()
     return sys.stdin.readline().strip()
 
 
 def setStiff(jointDict: dict, stiff: bool) -> None:
+    """Set compliance state for all joints in the dict."""
     for j in jointDict.values():
         j.compliant = not stiff
 
 
 def captureArm(arm, armId: str) -> list[float]:
+    """
+    Return the current joint positions for one arm.
+
+    @param arm: Arm controller object.
+    @param armId: Joint name prefix ('r' or 'l').
+    @type armId: str
+    @rtype: list
+    """
     result = []
     for name in JOINT_ORDER:
         sided = f"{armId}_{name}"
@@ -42,10 +53,21 @@ def captureArm(arm, armId: str) -> list[float]:
 
 
 def captureHead(reachyC) -> list[float]:
+    """
+    Return the current disk positions for the head.
+
+    @rtype: list
+    """
     return [round(j.present_position, 2) for j in reachyC.head.getDisksInOrder()]
 
 
 def loadLibrary() -> dict:
+    """
+    Load the animation library from disk.
+
+    @return: Library dict with 'animations' key.
+    @rtype: dict
+    """
     if not Path(ANIMATION_FILE).exists():
         return {"animations": []}
     try:
@@ -56,13 +78,20 @@ def loadLibrary() -> dict:
 
 
 def saveLibrary(lib: dict) -> None:
+    """
+    Save the animation library to disk.
+
+    @param lib: Library dict to save.
+    @type lib: dict
+    """
     with open(ANIMATION_FILE, "w") as f:
         json.dump(lib, f, indent=2, ensure_ascii=False)
     print(f"  Saved {len(lib['animations'])} animation(s) to {ANIMATION_FILE}")
 
 
 def printSummary(lib: dict) -> None:
-    print("\n── Animation Library ────────────────────────────────────")
+    """Print a formatted summary of all animations in the library."""
+    print("\nAnimation Library")
     anims = lib.get("animations", [])
     if not anims:
         print("  (empty)")
@@ -80,14 +109,15 @@ def printSummary(lib: dict) -> None:
             arm = f"  arm:{a['arm']}" if a.get("arm") else ""
             print(f"    {a['label']:<20} keyframes:{keyframes}  step:{step}s  dur:{dur}s  parts:{parts}{role}{arm}")
             if a.get("description"):
-                print(f"    {'':20} → {a['description']}")
-    print("─────────────────────────────────────────────────────────\n")
+                print(f"    {'':20} -> {a['description']}")
+    print()
 
 
 def askParts() -> list[str]:
+    """Prompt the user to select which body parts to capture."""
     print("  Parts captured in each keyframe?")
     print("  r=right arm  l=left arm  h=head  (combine: rl / rh / lh / rlh)")
-    raw = getLine("  → ").lower().strip()
+    raw = getLine("  -> ").lower().strip()
     parts = []
     if "r" in raw:
         parts.append("right")
@@ -102,6 +132,7 @@ def askParts() -> list[str]:
 
 
 def askStepDuration() -> float:
+    """Prompt the user for a step duration in seconds."""
     raw = getLine("  Step duration in seconds (Enter = 0.5): ").strip()
     try:
         v = float(raw)
@@ -111,6 +142,7 @@ def askStepDuration() -> float:
 
 
 def askCategory() -> str:
+    """Prompt the user to select an animation category."""
     while True:
         raw = getLine("  Category (e=emotion / c=conversational / x=explanation): ").strip().lower()
         if raw in ("e", "emotion"):
@@ -123,6 +155,7 @@ def askCategory() -> str:
 
 
 def askArm() -> str:
+    """Prompt the user to select which arm the animation represents."""
     while True:
         raw = getLine("  Arm this animation represents (r=right / l=left / both): ").strip().lower()
         if raw in ("r", "right"):
@@ -135,6 +168,17 @@ def askArm() -> str:
 
 
 def previewKeyframes(reachyC, keyframes: list, parts: list, stepDuration: float) -> None:
+    """
+    Play back the recorded keyframes on the robot.
+
+    @param reachyC: Reachy controller instance.
+    @param keyframes: List of keyframe dicts.
+    @type keyframes: list
+    @param parts: Body parts to animate.
+    @type parts: list
+    @param stepDuration: Duration per keyframe step in seconds.
+    @type stepDuration: float
+    """
     from reachy_sdk import trajectory as traj
 
     if not keyframes:
@@ -203,17 +247,17 @@ def main() -> None:
         if key in ("r", "R"):
             stiff["right"] = not stiff["right"]
             setStiff(rightJoints, stiff["right"])
-            print(f"  RIGHT → {'STIFF' if stiff['right'] else 'compliant'}")
+            print(f"  RIGHT -> {'STIFF' if stiff['right'] else 'compliant'}")
 
         elif key in ("l", "L"):
             stiff["left"] = not stiff["left"]
             setStiff(leftJoints, stiff["left"])
-            print(f"  LEFT  → {'STIFF' if stiff['left'] else 'compliant'}")
+            print(f"  LEFT  -> {'STIFF' if stiff['left'] else 'compliant'}")
 
         elif key in ("h", "H"):
             stiff["head"] = not stiff["head"]
             setStiff(headJoints, stiff["head"])
-            print(f"  HEAD  → {'STIFF' if stiff['head'] else 'compliant'}")
+            print(f"  HEAD  -> {'STIFF' if stiff['head'] else 'compliant'}")
 
         elif key == " ":
             kf = {"right": captureArm(reachyC.armRight, "r"), "left": captureArm(reachyC.armLeft, "l"), "head": captureHead(reachyC)}

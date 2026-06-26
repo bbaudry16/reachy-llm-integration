@@ -1,22 +1,12 @@
 """
-poseVariation.py
-────────────────
-Adds subtle randomness to static arm poses so Reachy never holds
-the exact same position twice.
+Adds subtle randomness to static arm poses so Reachy never holds the exact same position twice.
 
-HOW IT WORKS
-  1. Compare every joint of the target pose against the neutral reference.
-  2. Find the joint with the largest absolute delta (= the "expressive" joint).
-  3. Apply a random offset ∈ [-MAX_VARIATION_DEG, +MAX_VARIATION_DEG] to that
-     joint, clamped so the result stays inside JOINT_LIMITS.
-  4. Only joints listed in VARIABLE_JOINTS are candidates for variation;
-     joints absent from that list are never touched.
+Joint indices follow JOINT_ORDER:
+  [shoulder_pitch, shoulder_roll, arm_yaw, elbow_pitch, forearm_yaw, wrist_pitch, wrist_roll, gripper]
 
-CONFIGURATION (edit freely)
-  MAX_VARIATION_DEG  – maximum random offset in degrees (global ceiling)
-  VARIABLE_JOINTS    – which joint indices may receive variation
-                       (index = position in the 8-value JOINT_ORDER list)
-  JOINT_LIMITS       – hard safety limits per joint index [min, max]
+Only joints listed in VARIABLE_JOINTS are candidates for variation.
+The joint with the largest deviation from neutral is selected and offset by a random amount,
+then clamped to JOINT_LIMITS.
 """
 
 import random
@@ -25,26 +15,12 @@ from typing import Optional
 import poseLibrary
 
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-
-# Maximum random offset applied to the chosen joint (degrees).
-# The actual offset is drawn uniformly from [-MAX, +MAX].
 MAX_VARIATION_DEG: float = 20.0
 
-# Maximum random offset applied to each antenna angle (degrees).
-# Applied independently to left and right antennas.
 MAX_ANTENNA_VARIATION_DEG: float = 8.0
 
-# Joint indices (0-based, matching JOINT_ORDER) that are allowed to vary.
-# JOINT_ORDER = [shoulder_pitch, shoulder_roll, arm_yaw, elbow_pitch,
-#                forearm_yaw, wrist_pitch, wrist_roll, gripper]
-#
-# Defaults: shoulder_pitch(0), shoulder_roll(1), arm_yaw(2), elbow_pitch(3)
-# Wrist/gripper joints are excluded — they are too close to mechanical limits.
 VARIABLE_JOINTS: list[int] = [0, 1, 2, 3]
 
-# Safety clamp per joint index [min_deg, max_deg].
-# None means no clamp for that joint.
 JOINT_LIMITS: dict[int, tuple[float, float]] = {
     0: (-130.0,  50.0),   # shoulder_pitch
     1: ( -80.0,  80.0),   # shoulder_roll
@@ -57,13 +33,15 @@ JOINT_LIMITS: dict[int, tuple[float, float]] = {
 }
 
 
-# ── Internal helpers ──────────────────────────────────────────────────────────
-
-_neutral_cache: Optional[dict] = None   # {"right": [...], "left": [...]}
+_neutral_cache: Optional[dict] = None
 
 
 def _getNeutral() -> dict:
-    """Return the neutral arm pose, cached after first load."""
+    """
+    Return the neutral arm pose, cached after first load.
+
+    @rtype: dict
+    """
     global _neutral_cache
     if _neutral_cache is not None:
         return _neutral_cache
@@ -77,9 +55,13 @@ def _getNeutral() -> dict:
 
 def _pickVariableJoint(joints: list[float], neutral: list[float]) -> int:
     """
-    Among VARIABLE_JOINTS, return the index with the largest |delta|
-    vs the neutral reference. Falls back to VARIABLE_JOINTS[0] if joints
-    is shorter than expected.
+    Return the index in VARIABLE_JOINTS with the largest absolute delta from neutral.
+
+    @param joints: Current joint values.
+    @type joints: list
+    @param neutral: Neutral joint values.
+    @type neutral: list
+    @rtype: int
     """
     best_idx = VARIABLE_JOINTS[0]
     best_delta = -1.0
@@ -101,23 +83,16 @@ def _clamp(value: float, idx: int) -> float:
     return max(lo, min(hi, value))
 
 
-# ── Public API ────────────────────────────────────────────────────────────────
-
 def applyVariation(joints: list[float], side: str) -> list[float]:
     """
-    Return a copy of `joints` with a random offset on the most expressive joint.
+    Return a copy of joints with a random offset applied to the most expressive joint.
 
-    Parameters
-    ----------
-    joints : list[float]
-        The 8 joint values for one arm (right or left).
-    side : str
-        "right" or "left" — selects the correct neutral reference.
-
-    Returns
-    -------
-    list[float]
-        A new list (never modifies the input) with one joint slightly varied.
+    @param joints: The 8 joint values for one arm.
+    @type joints: list
+    @param side: 'right' or 'left'.
+    @type side: str
+    @return: New joint list with one joint slightly varied.
+    @rtype: list
     """
     neutral = _getNeutral().get(side, [0.0] * 8)
     result = list(joints)
@@ -130,25 +105,21 @@ def applyVariation(joints: list[float], side: str) -> list[float]:
 
 
 def invalidateNeutralCache() -> None:
-    """Call this if poses_library.json is reloaded at runtime."""
+    """Invalidate the neutral pose cache. Call if poses_library.json is reloaded at runtime."""
     global _neutral_cache
     _neutral_cache = None
 
 
 def applyAntennaVariation(left: float, right: float) -> tuple[float, float]:
     """
-    Return (left, right) antenna angles with independent random offsets.
-    The offset amplitude is controlled by MAX_ANTENNA_VARIATION_DEG,
-    separate from the arm-joint MAX_VARIATION_DEG.
+    Return antenna angles with independent random offsets applied to each side.
 
-    Parameters
-    ----------
-    left  : float  – target left antenna angle (degrees)
-    right : float  – target right antenna angle (degrees)
-
-    Returns
-    -------
-    tuple[float, float] – (varied_left, varied_right)
+    @param left: Target left antenna angle in degrees.
+    @type left: float
+    @param right: Target right antenna angle in degrees.
+    @type right: float
+    @return: (varied_left, varied_right)
+    @rtype: tuple
     """
     varied_left  = left  + random.uniform(-MAX_ANTENNA_VARIATION_DEG, MAX_ANTENNA_VARIATION_DEG)
     varied_right = right + random.uniform(-MAX_ANTENNA_VARIATION_DEG, MAX_ANTENNA_VARIATION_DEG)

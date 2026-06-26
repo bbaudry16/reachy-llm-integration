@@ -6,10 +6,25 @@ from reachy_sdk.camera import ZoomLevel
 
 
 class FaceTracker:
+    """
+    Detects faces from Reachy's left camera and tracks the largest one.
+
+    @ivar faceCount: Number of consecutive frames with a valid camera frame.
+    @type faceCount: int
+    """
 
     MAX_FACE_COUNT = 5
 
     def __init__(self, reachyController, fps: float = 10.0, fovHDeg: float = 125.0, fovVDeg: float = 93.0):
+        """
+        @param reachyController: Reachy controller instance.
+        @param fps: Detection loop frequency in Hz.
+        @type fps: float
+        @param fovHDeg: Horizontal field of view in degrees.
+        @type fovHDeg: float
+        @param fovVDeg: Vertical field of view in degrees.
+        @type fovVDeg: float
+        """
         self._reachy = reachyController
         self._detector = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
         self._fps = fps
@@ -23,16 +38,24 @@ class FaceTracker:
         self._reachy.head.setCameraZoomLevel(ZoomLevel.OUT)
 
     def start(self) -> None:
+        """Start the detection loop in a background thread."""
         self._running = True
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
 
     def stop(self) -> None:
+        """Stop the detection loop and join the thread."""
         self._running = False
         if self._thread:
             self._thread.join(timeout=2)
 
     def getFaceCenter(self) -> tuple | None:
+        """
+        Return the normalized center of the largest detected face.
+
+        @return: (cx, cy) in [-1, 1] or None if no face detected.
+        @rtype: tuple or None
+        """
         with self._lock:
             return self._faceCenter
 
@@ -65,12 +88,30 @@ class FaceTracker:
             time.sleep(max(0, interval - (time.time() - t)))
 
     def getLookAtTarget(self) -> list | None:
+        """
+        Convert the current face center to a 3D look-at target.
+
+        @return: [x, y, z] in meters, or None if no face detected.
+        @rtype: list or None
+        """
         face = self.getFaceCenter()
         if face is None:
             return None
         return self._faceToLookAt(face[0], face[1])
 
     def _faceToLookAt(self, cxNorm: float, cyNorm: float, distance: float = 1.0) -> list:
+        """
+        Convert normalized face coordinates to a 3D look-at point.
+
+        @param cxNorm: Normalized horizontal position in [-1, 1].
+        @type cxNorm: float
+        @param cyNorm: Normalized vertical position in [-1, 1].
+        @type cyNorm: float
+        @param distance: Target distance in meters.
+        @type distance: float
+        @return: [x, y, z] look-at coordinates.
+        @rtype: list
+        """
         angleH = cxNorm * (self._fovH / 2)
         angleV = -cyNorm * (self._fovV / 2)
         x = distance * math.cos(math.radians(angleV)) * math.cos(math.radians(angleH))

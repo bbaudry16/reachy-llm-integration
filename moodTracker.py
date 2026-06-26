@@ -3,7 +3,6 @@ import time
 
 
 _POSE_TO_MOOD: dict[str, str] = {
-    # Arms
     "shocked":    "shocked",
     "suprised":   "surprised",
     "excited":    "excited",
@@ -13,13 +12,11 @@ _POSE_TO_MOOD: dict[str, str] = {
     "thinking":   "thoughtful",
     "sad":        "sad",
     "defeated":   "defeated",
-    # Head
     "depressed":  "defeated",
     "curious":    "curious",
     "shy":        "shy",
     "angry":      "angry",
     "pissed":     "angry",
-    # Antennas
     "panicking":  "panicking",
     "crazy":      "playful",
 }
@@ -47,9 +44,23 @@ _MOOD_DESCRIPTIONS: dict[str, str] = {
 
 
 class MoodTracker:
-    """Tracks Reachy's emotional state across conversation turns."""
+    """
+    Tracks Reachy's emotional state across conversation turns.
+
+    Mood is detected from pose labels and speech keywords in each response,
+    then decays exponentially over subsequent turns.
+
+    @ivar mood: Current mood label.
+    @type mood: str
+    @ivar intensity: Current mood intensity between 0.0 and 1.0.
+    @type intensity: float
+    """
 
     def __init__(self, decay_turns: int = _MOOD_DECAY_TURNS):
+        """
+        @param decay_turns: Number of turns for intensity to halve.
+        @type decay_turns: int
+        """
         self.decay_turns   = decay_turns
         self.mood          = "neutral"
         self.intensity     = 0.0
@@ -58,8 +69,10 @@ class MoodTracker:
 
     def update_from_response(self, result: dict) -> None:
         """
-        Parse a Mistral result dict (keys: speech, ryi) and update mood.
-        Call this immediately after client.ask().
+        Update mood from a Mistral response dict.
+
+        @param result: Response dict with 'speech' and 'ryi' keys.
+        @type result: dict
         """
         ryi    = result.get("ryi", "")
         speech = result.get("speech", "")
@@ -78,7 +91,12 @@ class MoodTracker:
             self._history = self._history[-20:]
 
     def build_context_message(self) -> dict | None:
+        """
+        Build a system context message describing the current mood.
 
+        @return: A system role message dict, or None if mood is neutral or faded.
+        @rtype: dict or None
+        """
         effective_intensity = self.intensity * self._decay_factor()
 
         if effective_intensity < _INTENSITY_THRESHOLD or self.mood == "neutral":
@@ -90,23 +108,32 @@ class MoodTracker:
 
         percent = int(effective_intensity * 100)
         lines = [
-            "═══ YOUR CURRENT EMOTIONAL STATE ═══",
+            "=== YOUR CURRENT EMOTIONAL STATE ===",
             f"Mood     : {self.mood}  (intensity {percent}%)",
             f"Context  : {desc}",
             "",
             "This mood colours your NEXT response. You do not need to mention it",
             "explicitly — let it show through your pose choices and speech tone.",
             "If the new topic naturally shifts your mood, allow the transition.",
-            "═════════════════════════════════════",
+            "=====================================",
         ]
         return {"role": "system", "content": "\n".join(lines)}
 
     def force_mood(self, mood: str, intensity: float = 1.0) -> None:
+        """
+        Force a specific mood and intensity.
+
+        @param mood: Mood label to set.
+        @type mood: str
+        @param intensity: Intensity value clamped to [0.0, 1.0].
+        @type intensity: float
+        """
         self.mood         = mood
         self.intensity    = max(0.0, min(1.0, intensity))
         self._turns_since = 0
 
     def reset(self) -> None:
+        """Reset mood to neutral."""
         self.mood         = "neutral"
         self.intensity    = 0.0
         self._turns_since = 0
@@ -116,9 +143,7 @@ class MoodTracker:
                 f"intensity={self.intensity:.2f}, "
                 f"turns_since={self._turns_since})")
 
-
     def _detect_mood(self, ryi: str, speech: str) -> str:
-
         for label, mood in _POSE_TO_MOOD.items():
             pattern = rf'(?<![a-z_]){re.escape(label)}(?![a-z_])'
             if re.search(pattern, ryi, re.IGNORECASE):

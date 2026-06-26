@@ -11,6 +11,7 @@ JOINT_ORDER = ["shoulder_pitch", "shoulder_roll", "arm_yaw", "elbow_pitch", "for
 
 
 def getKey() -> str:
+    """Read a single keypress from stdin without echoing."""
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
     try:
@@ -21,17 +22,27 @@ def getKey() -> str:
 
 
 def getLine(prompt: str) -> str:
+    """Print a prompt and read a line from stdin."""
     sys.stdout.write(prompt)
     sys.stdout.flush()
     return sys.stdin.readline().strip()
 
 
 def setStiff(jointDict: dict, stiff: bool) -> None:
+    """Set compliance state for all joints in the dict."""
     for j in jointDict.values():
         j.compliant = not stiff
 
 
 def captureArm(arm, armId: str) -> list[float]:
+    """
+    Return the current joint positions for one arm.
+
+    @param arm: Arm controller object.
+    @param armId: Joint name prefix ('r' or 'l').
+    @type armId: str
+    @rtype: list
+    """
     result = []
     for name in JOINT_ORDER:
         sided = f"{armId}_{name}"
@@ -41,10 +52,21 @@ def captureArm(arm, armId: str) -> list[float]:
 
 
 def captureHead(reachyC) -> list[float]:
+    """
+    Return the current disk positions for the head.
+
+    @rtype: list
+    """
     return [round(j.present_position, 2) for j in reachyC.head.getDisksInOrder()]
 
 
 def captureAntennas(reachyC) -> tuple[float, float]:
+    """
+    Return (left, right) antenna angles.
+
+    @return: (left_angle, right_angle) in degrees.
+    @rtype: tuple
+    """
     head = reachyC.head._reachyHead
     def getAnt(names):
         for n in names:
@@ -56,6 +78,11 @@ def captureAntennas(reachyC) -> tuple[float, float]:
 
 
 def loadLibrary() -> dict:
+    """
+    Load the pose library from disk.
+
+    @rtype: dict
+    """
     if not Path(LIBRARY_FILE).exists():
         return {"arms": [], "head": [], "antennas": []}
     try:
@@ -66,11 +93,18 @@ def loadLibrary() -> dict:
 
 
 def saveLibrary(lib: dict) -> None:
+    """
+    Save the pose library to disk.
+
+    @param lib: Library dict to save.
+    @type lib: dict
+    """
     with open(LIBRARY_FILE, "w") as f:
         json.dump(lib, f, indent=2, ensure_ascii=False)
 
 
 def askCategory() -> str:
+    """Prompt the user to select a pose category."""
     while True:
         raw = getLine("  Category (e=emotion / c=conversational / x=explanation): ").strip().lower()
         if raw in ("e", "emotion"):
@@ -83,6 +117,7 @@ def askCategory() -> str:
 
 
 def askArm() -> str:
+    """Prompt the user to select an arm side."""
     while True:
         raw = getLine("  Arm (r=right / l=left): ").strip().lower()
         if raw in ("r", "right"):
@@ -93,7 +128,8 @@ def askArm() -> str:
 
 
 def printSummary(lib: dict) -> None:
-    print("\n── Library ──────────────────────────────────────")
+    """Print a formatted summary of all poses in the library."""
+    print("\nLibrary")
     for section in ("arms", "head", "antennas"):
         entries = lib[section]
         print(f"  {section} ({len(entries)} poses):")
@@ -106,7 +142,7 @@ def printSummary(lib: dict) -> None:
                 role = f"  role:{e['role']}" if e.get("role") else ""
                 arm = f"  arm:{e['arm']}" if e.get("arm") else ""
                 print(f"      {e['label']:<18} {e.get('description', '')}{role}{arm}")
-    print("─────────────────────────────────────────────────\n")
+    print()
 
 
 def main() -> None:
@@ -134,17 +170,17 @@ def main() -> None:
         if key in ("r", "R"):
             stiff["right"] = not stiff["right"]
             setStiff(rightJoints, stiff["right"])
-            print(f"  RIGHT → {'STIFF' if stiff['right'] else 'compliant'}")
+            print(f"  RIGHT -> {'STIFF' if stiff['right'] else 'compliant'}")
 
         elif key in ("l", "L"):
             stiff["left"] = not stiff["left"]
             setStiff(leftJoints, stiff["left"])
-            print(f"  LEFT  → {'STIFF' if stiff['left'] else 'compliant'}")
+            print(f"  LEFT  -> {'STIFF' if stiff['left'] else 'compliant'}")
 
         elif key in ("h", "H"):
             stiff["head"] = not stiff["head"]
             setStiff(headJoints, stiff["head"])
-            print(f"  HEAD  → {'STIFF' if stiff['head'] else 'compliant'}")
+            print(f"  HEAD  -> {'STIFF' if stiff['head'] else 'compliant'}")
 
         elif key == " ":
             rJoints = captureArm(reachyC.armRight, "r")
@@ -155,15 +191,14 @@ def main() -> None:
             except Exception:
                 antL, antR = 0.0, 0.0
 
-            print("\n── Captured ─────────────────────────────────────")
+            print("\nCaptured")
             print(f"  R joints: {rJoints}")
             print(f"  L joints: {lJoints}")
             print(f"  Head:     roll={look[0]}  pitch={look[1]}  yaw={look[2]}")
             print(f"  Ant:      L={antL}  R={antR}")
-            print("─────────────────────────────────────────────────")
 
             print("  What? a=arms  h=head  n=antennas  all=all  skip=nothing")
-            choice = getLine("  → ").strip().lower()
+            choice = getLine("  -> ").strip().lower()
             if choice == "skip":
                 print("  Skipped.")
                 continue
@@ -184,18 +219,18 @@ def main() -> None:
                     role = getLine("  Role (what this arm represents, e.g. 'orbit', 'origin', 'rise'): ").strip()
                     joints = rJoints if arm == "right" else lJoints
                     lib["arms"].append({**base, "arm": arm, "role": role, "joints": joints})
-                    print(f"  ✓ Arm [{label}] [{category}] arm:{arm} role:{role}")
+                    print(f"  Arm [{label}] [{category}] arm:{arm} role:{role}")
                 else:
                     lib["arms"].append({**base, "right_joints": rJoints, "left_joints": lJoints})
-                    print(f"  ✓ Arms [{label}] [{category}]")
+                    print(f"  Arms [{label}] [{category}]")
 
             if choice in ("h", "all"):
                 lib["head"].append({**base, "angles": look})
-                print(f"  ✓ Head [{label}] [{category}]")
+                print(f"  Head [{label}] [{category}]")
 
             if choice in ("n", "all"):
                 lib["antennas"].append({**base, "left": antL, "right": antR})
-                print(f"  ✓ Antennas [{label}] [{category}]")
+                print(f"  Antennas [{label}] [{category}]")
 
             saveLibrary(lib)
 

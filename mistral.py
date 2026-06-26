@@ -7,6 +7,18 @@ from moodTracker import MoodTracker
 
 
 class MistralClient:
+    """
+    Wraps the Mistral chat completion API with conversation history and mood tracking.
+
+    @ivar APIKey: Mistral API key.
+    @type APIKey: str
+    @ivar systemPrompt: System prompt sent at the start of every request.
+    @type systemPrompt: str
+    @ivar history: Conversation history as a list of role/content dicts.
+    @type history: list
+    @ivar mood: Mood tracker updated after each response.
+    @type mood: MoodTracker
+    """
 
     API_URL = "https://api.mistral.ai/v1/chat/completions"
     MODEL   = "mistral-small-2503"
@@ -20,6 +32,20 @@ class MistralClient:
         historySize: int   = 10,
         rateLimit: float   = 1.1,
     ):
+        """
+        @param systemPrompt: System prompt injected at the start of every request.
+        @type systemPrompt: str
+        @param APIKey: Mistral API key. Falls back to MISTRAL_API_KEY env var.
+        @type APIKey: str
+        @param maxTokens: Maximum tokens in the completion.
+        @type maxTokens: int
+        @param temperature: Sampling temperature.
+        @type temperature: float
+        @param historySize: Maximum number of messages kept in history.
+        @type historySize: int
+        @param rateLimit: Minimum seconds between requests.
+        @type rateLimit: float
+        """
         self.APIKey       = APIKey or os.environ.get("MISTRAL_API_KEY")
         self.systemPrompt = systemPrompt
         self.maxTokens    = maxTokens
@@ -35,7 +61,6 @@ class MistralClient:
         elapsed = time.time() - self._lastRequestTime
         if elapsed < self.rateLimit:
             time.sleep(self.rateLimit - elapsed)
-
 
     def _buildMessages(self, user_message: str) -> list:
         messages = [{"role": "system", "content": self.systemPrompt}]
@@ -54,8 +79,15 @@ class MistralClient:
         if len(self.history) > self.historySize:
             self.history = self.history[-self.historySize:]
 
-
     def ask(self, user_message: str) -> dict:
+        """
+        Send a message and return the parsed JSON response.
+
+        @param user_message: The user's input text.
+        @type user_message: str
+        @return: Parsed response dict with keys 'speech' and 'ryi'.
+        @rtype: dict
+        """
         self._waitRateLimit()
 
         headers = {
@@ -89,5 +121,6 @@ class MistralClient:
         return result
 
     def clearHistory(self) -> None:
+        """Clear conversation history and reset mood."""
         self.history = []
         self.mood.reset()
